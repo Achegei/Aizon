@@ -5,7 +5,7 @@
             <h4 class="text-white font-semibold mb-3">AIZON Market</h4>
             <ul class="space-y-2">
                 <li><a href="#" class="hover:text-purple-400">About</a></li>
-                <li><a href="{{ route('pricing.index') }}" class="hover:text-purple-400">Pricing</a></li>
+                <li><a href="{{ route('public.pricing.index') }}" class="hover:text-purple-400">Pricing</a></li>
                 <li><a href="#" class="hover:text-purple-400">FAQ</a></li>
             </ul>
         </div>
@@ -13,17 +13,17 @@
         <div>
             <h4 class="text-white font-semibold mb-3">Marketplace</h4>
             <ul class="space-y-2">
-                <li><a href="{{ route('tools.index') }}" class="hover:text-purple-400">AI Tools</a></li>
-                <li><a href="{{ route('courses.index') }}" class="hover:text-purple-400">Courses</a></li>
-                <li><a href="{{ route('jobs.index') }}" class="hover:text-purple-400">Jobs</a></li>
-                <li><a href="{{ route('hire.index') }}" class="hover:text-purple-400">Hire Talent</a></li>
+                <li><a href="{{ route('public.tools.index') }}" class="hover:text-purple-400">AI Tools</a></li>
+                <li><a href="{{ route('public.courses.index') }}" class="hover:text-purple-400">Courses</a></li>
+                <li><a href="{{ route('public.jobs.index') }}" class="hover:text-purple-400">Jobs</a></li>
+                <li><a href="{{ route('public.hire.index') }}" class="hover:text-purple-400">Hire Talent</a></li>
             </ul>
         </div>
 
         <div>
             <h4 class="text-white font-semibold mb-3">Creators</h4>
             <ul class="space-y-2">
-                <li><a href="{{ route('sell.index') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
+                <li><a href="{{ route('public.sell.index') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
                 <li><a href="#" class="hover:text-purple-400">Creator Dashboard</a></li>
             </ul>
         </div>

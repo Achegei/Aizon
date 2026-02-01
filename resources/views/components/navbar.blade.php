@@ -4,12 +4,25 @@
     </div>
 
     <ul class="flex gap-6 text-sm">
-        <li><a href="{{ route('tools.index') }}" class="hover:text-purple-400">AI Tools</a></li>
-        <li><a href="{{ route('courses.index') }}" class="hover:text-purple-400">Courses</a></li>
-        <li><a href="{{ route('jobs.index') }}" class="hover:text-purple-400">Jobs</a></li>
-        <li><a href="{{ route('hire.index') }}" class="hover:text-purple-400">Hire Talent</a></li>
-        <li><a href="{{ route('sell.index') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
-        <li><a href="{{ route('pricing.index') }}" class="hover:text-purple-400">Pricing</a></li>
-        <li><a href="#" class="hover:text-purple-400">Login</a></li>
+        <li><a href="{{ route('public.tools.index') }}" class="hover:text-purple-400">AI Tools</a></li>
+        <li><a href="{{ route('public.courses.index') }}" class="hover:text-purple-400">Courses</a></li>
+        <li><a href="{{ route('public.jobs.index') }}" class="hover:text-purple-400">Jobs</a></li>
+        <li><a href="{{ route('public.hire.index') }}" class="hover:text-purple-400">Hire Talent</a></li>
+        <li><a href="{{ route('public.sell.index') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
+        <li><a href="{{ route('public.pricing.index') }}" class="hover:text-purple-400">Pricing</a></li>
+
+        @guest
+            <!-- Show Login if not logged in -->
+            <li><a href="{{ route('login') }}" class="hover:text-purple-400">Login</a></li>
+        @else
+            <!-- Show user name and Logout if logged in -->
+            <li class="flex items-center gap-2">
+                <span class="text-gray-300">Hi, {{ auth()->user()->name }}</span>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="hover:text-purple-400">Logout</button>
+                </form>
+            </li>
+        @endguest
     </ul>
 </nav>
