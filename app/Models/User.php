@@ -21,6 +21,7 @@ class User extends Authenticatable
         'role',        // Enum-backed column
         'settings',    // JSON user preferences
         'is_active',
+        'is_approved', // For marketplace approval workflow
     ];
 
     /**
@@ -37,11 +38,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
 
-        // Laravel 12 default
+        // Laravel default hashed password
         'password' => 'hashed',
 
         // Flags
         'is_active' => 'boolean',
+        'is_approved' => 'boolean',
 
         // JSON
         'settings' => 'array',
@@ -56,9 +58,22 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SUPER_ADMIN;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === UserRole::ADMIN;
+        return in_array($this->role, [
+            UserRole::SUPER_ADMIN,
+            UserRole::ADMIN,
+        ]);
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === UserRole::STAFF;
     }
 
     public function isCreator(): bool
@@ -74,6 +89,30 @@ class User extends Authenticatable
     public function isBuyer(): bool
     {
         return $this->role === UserRole::BUYER;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Approval Workflow
+    |--------------------------------------------------------------------------
+    */
+
+    public function needsApproval(): bool
+    {
+        return in_array($this->role, [UserRole::CREATOR, UserRole::EMPLOYER]) && !$this->is_approved;
+    }
+
+    public function canPerform(string $action): bool
+    {
+        // Example dynamic permissions logic
+        // You could replace this with a permissions table later
+        $permissions = [
+            UserRole::SUPER_ADMIN->value => ['manage_admins','manage_staff','approve_users','delete_users','post_jobs','access_marketplace'],
+            UserRole::ADMIN->value       => ['manage_staff','approve_users','delete_users','post_jobs','access_marketplace'],
+            UserRole::STAFF->value       => ['post_jobs','access_marketplace'],
+        ];
+
+        return in_array($action, $permissions[$this->role->value] ?? []);
     }
 
     /*
@@ -101,5 +140,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Payout::class, 'user_id');
     }
-
 }

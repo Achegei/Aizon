@@ -9,6 +9,15 @@ use Illuminate\Support\Str;
 
 class ToolController extends Controller
 {
+    public function __construct()
+    {
+        // Ensure only authenticated creators can access these routes
+        $this->middleware('auth');
+    }
+
+    /**
+     * List all tools of the authenticated creator
+     */
     public function index()
     {
         $tools = Tool::where('creator_id', auth()->id())->latest()->get();
@@ -16,13 +25,33 @@ class ToolController extends Controller
         return view('creator.tools.index', compact('tools'));
     }
 
+    /**
+     * Show form to create a new tool
+     */
     public function create()
     {
+        $user = auth()->user();
+
+        if (!$user->is_approved) {
+            return redirect()->route('creator.tools.index')
+                ->with('error', 'Your account is pending approval. You cannot create tools yet.');
+        }
+
         return view('creator.tools.create');
     }
 
+    /**
+     * Store a new tool
+     */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        if (!$user->is_approved) {
+            return redirect()->route('creator.tools.index')
+                ->with('error', 'Your account is pending approval. You cannot create tools yet.');
+        }
+
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -31,12 +60,12 @@ class ToolController extends Controller
         ]);
 
         Tool::create([
-            'creator_id' => auth()->id(),
-            'title'      => $validated['title'],
-            'slug'       => Str::slug($validated['title']),
-            'description'=> $validated['description'] ?? null,
-            'price'      => $validated['price'],
-            'category_id'=> $validated['category_id'] ?? null,
+            'creator_id'  => $user->id,
+            'title'       => $validated['title'],
+            'slug'        => $this->generateUniqueSlug($validated['title']),
+            'description' => $validated['description'] ?? null,
+            'price'       => $validated['price'],
+            'category_id' => $validated['category_id'] ?? null,
         ]);
 
         return redirect()
@@ -44,6 +73,9 @@ class ToolController extends Controller
             ->with('success', 'Tool created successfully.');
     }
 
+    /**
+     * Show form to edit a tool
+     */
     public function edit(Tool $tool)
     {
         $this->authorize('update', $tool);
@@ -51,6 +83,9 @@ class ToolController extends Controller
         return view('creator.tools.edit', compact('tool'));
     }
 
+    /**
+     * Update a tool
+     */
     public function update(Request $request, Tool $tool)
     {
         $this->authorize('update', $tool);
@@ -64,7 +99,7 @@ class ToolController extends Controller
 
         $tool->update([
             'title'       => $validated['title'],
-            'slug'        => Str::slug($validated['title']),
+            'slug'        => $this->generateUniqueSlug($validated['title'], $tool->id),
             'description' => $validated['description'] ?? null,
             'price'       => $validated['price'],
             'category_id' => $validated['category_id'] ?? null,
@@ -75,6 +110,9 @@ class ToolController extends Controller
             ->with('success', 'Tool updated successfully.');
     }
 
+    /**
+     * Delete a tool
+     */
     public function destroy(Tool $tool)
     {
         $this->authorize('delete', $tool);
@@ -82,5 +120,18 @@ class ToolController extends Controller
         $tool->delete();
 
         return back()->with('success', 'Tool deleted.');
+    }
+
+    /**
+     * Generate a unique slug for the tool
+     */
+    protected function generateUniqueSlug(string $title, int $ignoreId = null): string
+    {
+        $slug = Str::slug($title);
+        $count = Tool::where('slug', $slug)
+            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+            ->count();
+
+        return $count ? "{$slug}-" . ($count + 1) : $slug;
     }
 }

@@ -21,8 +21,9 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if ($user->role !== UserRole::ADMIN->value) {
-            // Logged in but not admin — show 403 page
+        // Only allow admin roles: super_admin, admin, staff
+        if (!$user->isAdmin()) {
+            // Logged in but not admin-level — show 403
             abort(403, 'Unauthorized');
         }
 
