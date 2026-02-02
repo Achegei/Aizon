@@ -10,18 +10,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of users.
-     */
     public function index()
     {
         $users = User::orderBy('id', 'desc')->get();
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Show the form for creating a new user/admin.
-     */
     public function create()
     {
         $roles = [
@@ -34,33 +28,36 @@ class UserController extends Controller
         return view('admin.users.create', compact('roles'));
     }
 
-    /**
-     * Store a newly created user in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,creator,employer,buyer',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'role'     => 'required|in:admin,creator,employer,buyer',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        $role = UserRole::from($request->role);
+
+        // Only Employer & Creator need approval
+        $isApproved = !in_array($role, [UserRole::EMPLOYER, UserRole::CREATOR]);
+        $isActive   = $isApproved;
+
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-            'is_active' => true,
-            'password' => Hash::make($request->password),
-            'settings' => ['is_super_admin' => $request->role === UserRole::ADMIN->value ? false : false],
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'role'        => $role->value,
+            'password'    => Hash::make($request->password),
+            'is_active'   => $isActive,
+            'is_approved' => $isApproved,
+            'settings'    => [],
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User created successfully.');
     }
 
-    /**
-     * Show the form for editing a user.
-     */
     public function edit(User $user)
     {
         $roles = [
@@ -73,34 +70,37 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    /**
-     * Update the specified user in storage.
-     */
     public function update(Request $request, User $user)
     {
-        // Prevent editing super admin
         if ($user->isSuperAdmin()) {
             return redirect()->back()->with('error', 'Cannot modify Super Admin.');
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,creator,employer,buyer',
+            'role'  => 'required|in:admin,creator,employer,buyer',
         ]);
+
+        $role = UserRole::from($request->role);
+
+        // Only Employer & Creator need approval
+        $isApproved = !in_array($role, [UserRole::EMPLOYER, UserRole::CREATOR]);
+        $isActive   = $isApproved;
 
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'role'        => $role->value,
+            'is_active'   => $isActive,
+            'is_approved' => $isApproved,
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified user from storage.
-     */
     public function destroy(User $user)
     {
         if ($user->isSuperAdmin()) {
@@ -109,6 +109,50 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User deleted successfully.');
+    }
+
+    // APPROVE USER
+    public function approve(User $user)
+    {
+        $role = strtolower($user->role instanceof UserRole ? $user->role->value : $user->role);
+
+        if (!in_array($role, ['employer', 'creator'])) {
+            return back()->with('error', 'This user does not require approval.');
+        }
+
+        if ($user->is_approved) {
+            return back()->with('info', 'User is already approved.');
+        }
+
+        $user->update([
+            'is_approved' => true,
+            'is_active'   => true,
+        ]);
+
+        return back()->with('success', 'User approved successfully.');
+    }
+
+    // DISAPPROVE USER
+    public function disapprove(User $user)
+    {
+        $role = strtolower($user->role instanceof UserRole ? $user->role->value : $user->role);
+
+        if (!in_array($role, ['employer', 'creator'])) {
+            return back()->with('error', 'This user cannot be disapproved.');
+        }
+
+        if (!$user->is_approved) {
+            return back()->with('info', 'User is already disapproved.');
+        }
+
+        $user->update([
+            'is_approved' => false,
+            'is_active'   => false,
+        ]);
+
+        return back()->with('success', 'User disapproved successfully.');
     }
 }

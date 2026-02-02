@@ -1,59 +1,107 @@
 {{-- resources/views/admin/users/index.blade.php --}}
-@extends('layouts.dashboard')
+@extends('layouts.dashboard') {{-- assuming you have an admin layout --}}
 
-@section('title', 'Users Management')
-@section('page-title', 'Users Management')
+@section('title', 'Manage Users')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
-    <a href="{{ route('admin.users.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">+ New User</a>
-</div>
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Users</h1>
 
-@if(session('success'))
-    <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
-        {{ session('success') }}
+    @if(session('success'))
+        <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 rounded">
+            <thead class="bg-gray-100 text-left">
+                <tr>
+                    <th class="p-3 border-b">ID</th>
+                    <th class="p-3 border-b">Name</th>
+                    <th class="p-3 border-b">Email</th>
+                    <th class="p-3 border-b">Role</th>
+                    <th class="p-3 border-b">Approval</th>
+                    <th class="p-3 border-b">Account</th>
+                    <th class="p-3 border-b">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($users as $user)
+                    @php
+                        // Ensure we have string role for display
+                        $role = strtolower($user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role);
+                    @endphp
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 border-b">{{ $user->id }}</td>
+                        <td class="p-3 border-b">{{ $user->name }}</td>
+                        <td class="p-3 border-b">{{ $user->email }}</td>
+                        <td class="p-3 border-b capitalize">{{ $role }}</td>
+
+                        {{-- Approval Column --}}
+                        <td class="p-3 border-b">
+                            @if(in_array($role, ['employer', 'creator']))
+                                @if($user->is_approved)
+                                    <span class="text-green-600 font-semibold">Approved</span>
+
+                                    {{-- Disapprove Button --}}
+                                    <form action="{{ route('admin.users.disapprove', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="ml-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                            Disapprove
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-yellow-600 font-semibold">Pending</span>
+
+                                    {{-- Approve Button --}}
+                                    <form action="{{ route('admin.users.approve', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="ml-2 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                            Approve
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                <span class="text-gray-600">—</span>
+                            @endif
+                        </td>
+
+                        {{-- Account Status --}}
+                        <td class="p-3 border-b">
+                            @if($user->is_active)
+                                <span class="text-green-600 font-semibold">Active</span>
+                            @else
+                                <span class="text-red-600 font-semibold">Inactive</span>
+                            @endif
+                        </td>
+
+                        {{-- Actions --}}
+                        <td class="p-3 border-b">
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                Edit
+                            </a>
+
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-800 ml-1">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-@endif
-
-<div class="overflow-x-auto bg-white rounded shadow">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-            @foreach($users as $user)
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">{{ $user->id }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($user->role->value) }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="{{ $user->is_active ? 'text-green-600' : 'text-red-600' }} font-medium">
-                        {{ $user->is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    @if(!$user->isSuperAdmin())
-                        <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
-                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                        </form>
-                    @else
-                        <span class="text-gray-400 italic">Protected</span>
-                    @endif
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
 </div>
 @endsection

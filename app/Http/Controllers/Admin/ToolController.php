@@ -9,16 +9,17 @@ use App\Models\Tool;
 class ToolController extends Controller
 {
     /**
-     * Display a listing of tools.
+     * Display a listing of all tools for admin approval.
      */
     public function index()
     {
-        $tools = Tool::latest()->get();
+        // Include creator info for admin overview
+        $tools = Tool::with('creator')->latest()->get();
         return view('admin.tools.index', compact('tools'));
     }
 
     /**
-     * Show the form for creating a new tool.
+     * Show the form for creating a new tool (optional for admin).
      */
     public function create()
     {
@@ -26,25 +27,7 @@ class ToolController extends Controller
     }
 
     /**
-     * Store a newly created tool.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'nullable|exists:categories,id',
-            'status' => 'nullable|in:active,inactive',
-        ]);
-
-        Tool::create($validated + ['creator_id' => auth()->id()]);
-
-        return redirect()->route('tools.index')->with('success', 'Tool created successfully.');
-    }
-
-    /**
-     * Show the form for editing a tool.
+     * Show the form for editing a tool (optional for admin).
      */
     public function edit(Tool $tool)
     {
@@ -52,25 +35,25 @@ class ToolController extends Controller
     }
 
     /**
-     * Update a tool.
+     * Approve a tool (set as active).
      */
-    public function update(Request $request, Tool $tool)
+    public function approve(Tool $tool)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'nullable|exists:categories,id',
-            'status' => 'nullable|in:active,inactive',
-        ]);
-
-        $tool->update($validated);
-
-        return redirect()->route('tools.index')->with('success', 'Tool updated successfully.');
+        $tool->update(['is_active' => true]);
+        return back()->with('success', 'Tool approved successfully.');
     }
 
     /**
-     * Delete a tool.
+     * Disapprove a tool (set as inactive).
+     */
+    public function disapprove(Tool $tool)
+    {
+        $tool->update(['is_active' => false]);
+        return back()->with('success', 'Tool disapproved successfully.');
+    }
+
+    /**
+     * Delete a tool permanently.
      */
     public function destroy(Tool $tool)
     {

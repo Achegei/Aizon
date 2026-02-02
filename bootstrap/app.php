@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'creator'  => \App\Http\Middleware\CreatorMiddleware::class,
             'employer' => \App\Http\Middleware\EmployerMiddleware::class,
             'role'     => \App\Http\Middleware\RoleMiddleware::class,
+            'approved' => \App\Http\Middleware\ApprovedMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

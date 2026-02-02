@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('employer.layouts.app')
 
 @section('content')
 <h1 class="text-2xl font-bold mb-4">Employer Dashboard</h1>

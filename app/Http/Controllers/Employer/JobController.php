@@ -3,122 +3,135 @@
 namespace App\Http\Controllers\Employer;
 
 use App\Http\Controllers\Controller;
-use App\Models\Job;
+use App\Models\JobListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class JobController extends Controller
 {
-    public function __construct()
-    {
-        // Ensure only authenticated employers can access these routes
-        $this->middleware('auth');
-    }
-
     /**
-     * List all jobs of the authenticated employer
+     * Display a listing of the employer's jobs.
      */
     public function index()
     {
-        $jobs = Job::where('creator_id', auth()->id())->latest()->get();
+        $jobs = JobListing::where('employer_id', auth()->id())
+            ->latest()
+            ->get();
+
         return view('employer.jobs.index', compact('jobs'));
     }
 
     /**
-     * Show form to create a new job
+     * Show the form for creating a new job.
      */
     public function create()
     {
-        $user = auth()->user();
-
-        if (!$user->is_approved) {
-            return redirect()->route('employer.jobs.index')
-                ->with('error', 'Your account is pending approval. You cannot create jobs yet.');
+        if (!auth()->user()->is_approved) {
+            return redirect()
+                ->route('employer.jobs.index')
+                ->with('error', 'Your account is pending approval. You cannot post jobs yet.');
         }
 
         return view('employer.jobs.create');
     }
 
     /**
-     * Store a new job
+     * Store a newly created job in storage.
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
-
-        if (!$user->is_approved) {
-            return redirect()->route('employer.jobs.index')
-                ->with('error', 'Your account is pending approval. You cannot create jobs yet.');
+        if (!auth()->user()->is_approved) {
+            return redirect()
+                ->route('employer.jobs.index')
+                ->with('error', 'Your account is pending approval. You cannot post jobs yet.');
         }
 
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'salary'      => 'nullable|numeric|min:0',
-            'category_id' => 'nullable|exists:categories,id',
-            'status'      => 'nullable|in:active,inactive',
+            'description' => 'required|string',
+            'location'    => 'nullable|string|max:255',
+            'type'        => 'required|in:full-time,part-time,contract,remote',
+            'salary_min'  => 'nullable|numeric|min:0',
+            'salary_max'  => 'nullable|numeric|min:0',
         ]);
 
-        Job::create([
-            'creator_id'  => $user->id,
+        JobListing::create([
+            'employer_id' => auth()->id(),
             'title'       => $validated['title'],
             'slug'        => $this->generateUniqueSlug($validated['title']),
-            'description' => $validated['description'] ?? null,
-            'salary'      => $validated['salary'] ?? null,
-            'category_id' => $validated['category_id'] ?? null,
-            'status'      => $validated['status'] ?? 'inactive',
+            'description' => $validated['description'],
+            'location'    => $validated['location'] ?? null,
+            'type'        => $validated['type'],
+            'salary_min'  => $validated['salary_min'] ?? null,
+            'salary_max'  => $validated['salary_max'] ?? null,
+            'is_active'   => 0, // admin approval required
         ]);
 
         return redirect()
             ->route('employer.jobs.index')
-            ->with('success', 'Job created successfully.');
+            ->with('success', 'Job submitted and pending admin approval.');
     }
 
     /**
-     * Show form to edit a job
+     * Show the form for editing the specified job.
      */
-    public function edit(Job $job)
+    public function edit(JobListing $job)
     {
-        $this->authorize('update', $job);
+        $this->authorizeJobOwner($job);
+
+        if (!auth()->user()->is_approved) {
+            return redirect()
+                ->route('employer.jobs.index')
+                ->with('error', 'Your account is pending approval. You cannot edit jobs yet.');
+        }
 
         return view('employer.jobs.edit', compact('job'));
     }
 
     /**
-     * Update a job
+     * Update the specified job in storage.
      */
-    public function update(Request $request, Job $job)
+    public function update(Request $request, JobListing $job)
     {
-        $this->authorize('update', $job);
+        $this->authorizeJobOwner($job);
+
+        if (!auth()->user()->is_approved) {
+            return redirect()
+                ->route('employer.jobs.index')
+                ->with('error', 'Your account is pending approval. You cannot update jobs yet.');
+        }
 
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'salary'      => 'nullable|numeric|min:0',
-            'category_id' => 'nullable|exists:categories,id',
-            'status'      => 'nullable|in:active,inactive',
+            'description' => 'required|string',
+            'location'    => 'nullable|string|max:255',
+            'type'        => 'required|in:full-time,part-time,contract,remote',
+            'salary_min'  => 'nullable|numeric|min:0',
+            'salary_max'  => 'nullable|numeric|min:0',
         ]);
 
         $job->update([
             'title'       => $validated['title'],
             'slug'        => $this->generateUniqueSlug($validated['title'], $job->id),
-            'description' => $validated['description'] ?? null,
-            'salary'      => $validated['salary'] ?? null,
-            'category_id' => $validated['category_id'] ?? null,
-            'status'      => $validated['status'] ?? 'inactive',
+            'description' => $validated['description'],
+            'location'    => $validated['location'] ?? null,
+            'type'        => $validated['type'],
+            'salary_min'  => $validated['salary_min'] ?? null,
+            'salary_max'  => $validated['salary_max'] ?? null,
+            'is_active'   => 0, // re-approval required
         ]);
 
         return redirect()
             ->route('employer.jobs.index')
-            ->with('success', 'Job updated successfully.');
+            ->with('success', 'Job updated and sent for re-approval.');
     }
 
     /**
-     * Delete a job
+     * Remove the specified job from storage.
      */
-    public function destroy(Job $job)
+    public function destroy(JobListing $job)
     {
-        $this->authorize('delete', $job);
+        $this->authorizeJobOwner($job);
 
         $job->delete();
 
@@ -126,15 +139,26 @@ class JobController extends Controller
     }
 
     /**
-     * Generate a unique slug for the job
+     * Generate a unique slug for the job title.
      */
     protected function generateUniqueSlug(string $title, int $ignoreId = null): string
     {
         $slug = Str::slug($title);
-        $count = Job::where('slug', $slug)
-            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+
+        $count = JobListing::where('slug', $slug)
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->count();
 
         return $count ? "{$slug}-" . ($count + 1) : $slug;
+    }
+
+    /**
+     * Check if the authenticated user owns this job.
+     */
+    protected function authorizeJobOwner(JobListing $job)
+    {
+        if ($job->employer_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
     }
 }
