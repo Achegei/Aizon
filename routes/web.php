@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JobApplicationController;
 
 // Auth
 use App\Http\Controllers\Auth\LoginController;
@@ -38,9 +39,16 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/ai-tools', [PageController::class, 'aiTools'])->name('public.tools.index');
 Route::get('/courses', [PageController::class, 'courses'])->name('public.courses.index');
 Route::get('/jobs', [PageController::class, 'jobs'])->name('public.jobs.index');
+Route::get('/jobs/{job}', [PageController::class, 'jobShow'])->name('public.jobs.show');
 Route::get('/hire-talent', [PageController::class, 'hireTalent'])->name('public.hire.index');
 Route::get('/sell-on-aizon', [PageController::class, 'sell'])->name('public.sell.index');
 Route::get('/pricing', [PageController::class, 'pricing'])->name('public.pricing.index');
+
+
+// Job application route (requires login)
+Route::middleware('auth')->group(function () {
+    Route::post('/jobs/{job}/apply', [JobApplicationController::class, 'store'])->name('jobs.apply');
+});
 
 /*
 |--------------------------------------------------------------------------

@@ -12,10 +12,10 @@ class JobApplication extends Model
 
     protected $fillable = [
         'user_id',
-        'job_post_id',
+        'job_post_id', // matches your table
         'cover_letter',
         'cv_path',
-        'status',
+        'status', // optional: pending, accepted, rejected
     ];
 
     /**
@@ -31,6 +31,6 @@ class JobApplication extends Model
      */
     public function job()
     {
-        return $this->belongsTo(JobListing::class);
+        return $this->belongsTo(JobListing::class, 'job_post_id'); // <-- specify custom FK
     }
 }

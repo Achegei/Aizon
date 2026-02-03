@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\JobListing;
 
 class PageController extends Controller
 {
@@ -27,8 +28,15 @@ class PageController extends Controller
 
     public function jobs()
     {
-        $jobs = [];
+        // Fetch active jobs only, latest first
+        $jobs = JobListing::with('employer')->where('is_active', true)->latest()->get();
         return view('pages.jobs', compact('jobs'));
+    }
+
+    // ✅ New method to show a single job
+    public function jobShow(JobListing $job)
+    {
+        return view('pages.job-show', compact('job'));
     }
 
     public function hireTalent()
