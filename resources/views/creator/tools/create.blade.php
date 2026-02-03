@@ -1,12 +1,27 @@
-@extends('layouts.dashboard')
+@extends('creator.layouts.app')
 
 @section('content')
-<div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6">Create New Tool</h1>
+<div class="max-w-3xl mx-auto px-6 py-10">
 
+    {{-- Page Header --}}
+    <div class="mb-10">
+        <span class="inline-block mb-2 text-xs font-semibold uppercase tracking-wide text-teal-600">
+            Tool Builder
+        </span>
+
+        <h1 class="text-3xl font-bold tracking-tight text-zinc-900">
+            Create a New Tool
+        </h1>
+
+        <p class="mt-2 text-sm text-zinc-500">
+            Build amazing tools and share them with your audience.
+        </p>
+    </div>
+
+    {{-- Errors --}}
     @if($errors->any())
-        <div class="bg-red-100 text-red-800 p-3 mb-4 rounded">
-            <ul class="list-disc pl-5">
+        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -14,66 +29,128 @@
         </div>
     @endif
 
-    <form action="{{ route('creator.tools.store') }}" method="POST" enctype="multipart/form-data">
+    {{-- Form --}}
+    <form action="{{ route('creator.tools.store') }}" method="POST" enctype="multipart/form-data"
+          class="space-y-8 bg-white rounded-xl border border-zinc-200 p-8 shadow-sm">
         @csrf
 
-        <!-- Title -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Title</label>
-            <input type="text" name="title" value="{{ old('title') }}" class="w-full border px-3 py-2 rounded" required>
+        {{-- Title --}}
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+                Tool Title
+            </label>
+            <input type="text" name="title" value="{{ old('title') }}" required
+                   placeholder="e.g. AI Text Summarizer"
+                   class="w-full rounded-lg border border-zinc-300 px-4 py-2.5
+                          text-sm focus:border-teal-500 focus:ring-teal-500">
         </div>
 
-        <!-- Description -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Description</label>
-            <textarea name="description" class="w-full border px-3 py-2 rounded" rows="4">{{ old('description') }}</textarea>
+        {{-- Description --}}
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+                Description
+            </label>
+            <textarea name="description" rows="4"
+                      placeholder="Describe your tool"
+                      class="w-full rounded-lg border border-zinc-300 px-4 py-2.5
+                             text-sm focus:border-teal-500 focus:ring-teal-500">{{ old('description') }}</textarea>
         </div>
 
-        <!-- Price -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Price (USD)</label>
-            <input type="number" step="0.01" name="price" value="{{ old('price') }}" class="w-full border px-3 py-2 rounded" required>
+        {{-- Price + Category --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-1">
+                    Price (USD)
+                </label>
+                <input type="number" step="0.01" name="price" value="{{ old('price') }}" required
+                       class="w-full rounded-lg border border-zinc-300 px-4 py-2.5
+                              text-sm focus:border-teal-500 focus:ring-teal-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-1">
+                    Category
+                </label>
+                <select name="category_id"
+                        class="w-full rounded-lg border border-zinc-300 px-4 py-2.5
+                               text-sm focus:border-teal-500 focus:ring-teal-500">
+                    <option value="">Select a category</option>
+                    @foreach(\App\Models\Category::all() as $category)
+                        <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
-        <!-- Category -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Category</label>
-            <select name="category_id" class="w-full border px-3 py-2 rounded">
-                <option value="">-- Select Category --</option>
-                @foreach(\App\Models\Category::all() as $category)
-                    <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
-                @endforeach
+        {{-- Status --}}
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+                Status
+            </label>
+            <select name="status"
+                    class="w-full rounded-lg border border-zinc-300 px-4 py-2.5
+                           text-sm focus:border-teal-500 focus:ring-teal-500">
+                <option value="inactive" @selected(old('status') == 'inactive')>
+                    Draft (Inactive)
+                </option>
+                <option value="active" @selected(old('status') == 'active')>
+                    Publish (Active)
+                </option>
             </select>
         </div>
 
-        <!-- Status -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Status</label>
-            <select name="status" class="w-full border px-3 py-2 rounded">
-                <option value="inactive" @selected(old('status') == 'inactive')>Inactive</option>
-                <option value="active" @selected(old('status') == 'active')>Active</option>
-            </select>
+        {{-- Tags --}}
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+                Tags
+            </label>
+            <input type="text" name="tags" value="{{ old('tags') }}"
+                   placeholder="AI, Productivity, Web Tools"
+                   class="w-full rounded-lg border border-zinc-300 px-4 py-2.5
+                          text-sm focus:border-teal-500 focus:ring-teal-500">
+            <p class="mt-1 text-xs text-zinc-500">
+                Separate tags with commas
+            </p>
         </div>
 
-        <!-- Tags -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Tags (comma-separated)</label>
-            <input type="text" name="tags" value="{{ old('tags') }}" class="w-full border px-3 py-2 rounded">
+        {{-- Thumbnail --}}
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+                Tool Thumbnail
+            </label>
+            <input type="file" name="thumbnail" accept="image/*"
+                   class="block w-full text-sm text-zinc-600
+                          file:mr-4 file:rounded-lg file:border-0
+                          file:bg-teal-50 file:px-4 file:py-2
+                          file:text-sm file:font-medium file:text-teal-700
+                          hover:file:bg-teal-100">
         </div>
 
-        <!-- Thumbnail -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Thumbnail</label>
-            <input type="file" name="thumbnail" accept="image/*" class="w-full border px-3 py-2 rounded">
+        {{-- Additional Media --}}
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">
+                Additional Media
+            </label>
+            <input type="file" name="media[]" multiple
+                   class="block w-full text-sm text-zinc-600
+                          file:mr-4 file:rounded-lg file:border-0
+                          file:bg-zinc-100 file:px-4 file:py-2
+                          file:text-sm file:font-medium file:text-zinc-700
+                          hover:file:bg-zinc-200">
         </div>
 
-        <!-- Additional Media -->
-        <div class="mb-4">
-            <label class="block mb-1 font-semibold">Additional Media</label>
-            <input type="file" name="media[]" multiple class="w-full border px-3 py-2 rounded">
+        {{-- Submit --}}
+        <div class="pt-4">
+            <button type="submit"
+                    class="inline-flex items-center gap-2 rounded-lg
+                           bg-gradient-to-r from-teal-600 to-emerald-600
+                           px-6 py-2.5 text-sm font-medium text-white
+                           shadow-sm hover:opacity-90 transition">
+                ⚡ Create Tool
+            </button>
         </div>
-
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Create Tool</button>
     </form>
 </div>
 @endsection

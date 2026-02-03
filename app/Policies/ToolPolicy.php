@@ -8,7 +8,7 @@ use App\Models\User;
 class ToolPolicy
 {
     /**
-     * Anyone can view published tools
+     * Anyone can view the list of tools
      */
     public function viewAny(?User $user): bool
     {
@@ -24,16 +24,17 @@ class ToolPolicy
     }
 
     /**
-     * Only creators and admins can create tools
+     * Only approved creators and admins can create tools
      */
     public function create(User $user): bool
     {
-        return $user->isCreator() || $user->isAdmin();
+        return ($user->isCreator() && $user->is_approved) || $user->isAdmin();
     }
 
     /**
-     * A creator can update their own tool
-     * Admin can update any tool
+     * Update a tool
+     * - Admin can update any tool
+     * - Approved creators can update their own tool
      */
     public function update(User $user, Tool $tool): bool
     {
@@ -41,11 +42,13 @@ class ToolPolicy
             return true;
         }
 
-        return $user->isCreator() && $tool->creator_id === $user->id;
+        return $user->isCreator() && $user->is_approved && $tool->creator_id === $user->id;
     }
 
     /**
-     * Same rules as update
+     * Delete a tool
+     * - Admin can delete any tool
+     * - Approved creators can delete their own tool
      */
     public function delete(User $user, Tool $tool): bool
     {
@@ -53,11 +56,11 @@ class ToolPolicy
             return true;
         }
 
-        return $user->isCreator() && $tool->creator_id === $user->id;
+        return $user->isCreator() && $user->is_approved && $tool->creator_id === $user->id;
     }
 
     /**
-     * Optional: restore
+     * Restore a tool (admin only)
      */
     public function restore(User $user, Tool $tool): bool
     {
@@ -65,7 +68,7 @@ class ToolPolicy
     }
 
     /**
-     * Optional: force delete
+     * Force delete a tool (admin only)
      */
     public function forceDelete(User $user, Tool $tool): bool
     {

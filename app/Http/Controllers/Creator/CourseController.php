@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Creator;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller; // ✅ Make sure this is the base Controller
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
+    /**
+     * Apply middleware to all routes
+     */
     public function __construct()
     {
-        // Ensure only authenticated creators can access these routes
-        $this->middleware('auth');
+        // Only authenticated users who are creators and approved
+        $this->middleware(['auth', 'creator', 'approved']);
     }
 
     /**
@@ -20,7 +23,9 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $courses = Course::where('creator_id', auth()->id())->latest()->get();
+        $courses = Course::where('creator_id', auth()->id())
+            ->latest()
+            ->get();
 
         return view('creator.courses.index', compact('courses'));
     }
@@ -30,13 +35,6 @@ class CourseController extends Controller
      */
     public function create()
     {
-        $user = auth()->user();
-
-        if (!$user->is_approved) {
-            return redirect()->route('creator.courses.index')
-                ->with('error', 'Your account is pending approval. You cannot create courses yet.');
-        }
-
         return view('creator.courses.create');
     }
 
@@ -45,13 +43,6 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
-
-        if (!$user->is_approved) {
-            return redirect()->route('creator.courses.index')
-                ->with('error', 'Your account is pending approval. You cannot create courses yet.');
-        }
-
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -60,7 +51,7 @@ class CourseController extends Controller
         ]);
 
         Course::create([
-            'creator_id'  => $user->id,
+            'creator_id'  => auth()->id(),
             'title'       => $validated['title'],
             'slug'        => $this->generateUniqueSlug($validated['title']),
             'description' => $validated['description'] ?? null,
@@ -68,8 +59,7 @@ class CourseController extends Controller
             'category_id' => $validated['category_id'] ?? null,
         ]);
 
-        return redirect()
-            ->route('creator.courses.index')
+        return redirect()->route('creator.courses.index')
             ->with('success', 'Course created successfully.');
     }
 
@@ -105,8 +95,7 @@ class CourseController extends Controller
             'category_id' => $validated['category_id'] ?? null,
         ]);
 
-        return redirect()
-            ->route('creator.courses.index')
+        return redirect()->route('creator.courses.index')
             ->with('success', 'Course updated successfully.');
     }
 
@@ -123,11 +112,12 @@ class CourseController extends Controller
     }
 
     /**
-     * Generate a unique slug for the course
+     * Generate a unique slug
      */
     protected function generateUniqueSlug(string $title, int $ignoreId = null): string
     {
         $slug = Str::slug($title);
+
         $count = Course::where('slug', $slug)
             ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
             ->count();

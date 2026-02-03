@@ -165,22 +165,41 @@ Route::middleware(['auth', 'creator', 'approved'])
     ->name('creator.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', [CreatorDashboard::class, 'index'])->name('dashboard');
 
+        /*
+        |--------------------------------------------------------------------------
+        | CREATOR TOOLS
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('tools')->name('tools.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Creator\ToolController::class, 'index'])->name('index');
             Route::get('/create', [\App\Http\Controllers\Creator\ToolController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Creator\ToolController::class, 'store'])->name('store');
             Route::get('/{tool}/edit', [\App\Http\Controllers\Creator\ToolController::class, 'edit'])->name('edit');
+            Route::put('/{tool}', [\App\Http\Controllers\Creator\ToolController::class, 'update'])->name('update');
+            Route::delete('/{tool}', [\App\Http\Controllers\Creator\ToolController::class, 'destroy'])->name('destroy');
         });
 
+        /*
+        |--------------------------------------------------------------------------
+        | CREATOR COURSES
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('courses')->name('courses.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Creator\CourseController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\Creator\CourseController::class, 'create'])->name('create');
-            Route::get('/{course}/edit', [\App\Http\Controllers\Creator\CourseController::class, 'edit'])->name('edit');
+            Route::get('/', [\App\Http\Controllers\Creator\CourseController::class, 'index'])->name('index'); // List all courses
+            Route::get('/create', [\App\Http\Controllers\Creator\CourseController::class, 'create'])->name('create'); // Show create form
+            Route::post('/', [\App\Http\Controllers\Creator\CourseController::class, 'store'])->name('store'); // Store new course
+            Route::get('/{course}/edit', [\App\Http\Controllers\Creator\CourseController::class, 'edit'])->name('edit'); // Show edit form
+            Route::put('/{course}', [\App\Http\Controllers\Creator\CourseController::class, 'update'])->name('update'); // Update course
+            Route::delete('/{course}', [\App\Http\Controllers\Creator\CourseController::class, 'destroy'])->name('destroy'); // Delete course
         });
 
+        // Earnings
         Route::get('/earnings', [\App\Http\Controllers\Creator\EarningsController::class, 'index'])->name('earnings.index');
     });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -192,8 +211,14 @@ Route::middleware(['auth', 'employer', 'approved'])
     ->name('employer.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', [EmployerDashboard::class, 'index'])->name('dashboard');
 
+        /*
+        |--------------------------------------------------------------------------
+        | JOBS
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('jobs')->name('jobs.')->group(function () {
             Route::get('/', [EmployerJobController::class, 'index'])->name('index');
             Route::get('/create', [EmployerJobController::class, 'create'])->name('create');
@@ -202,6 +227,27 @@ Route::middleware(['auth', 'employer', 'approved'])
             Route::put('/{job}', [EmployerJobController::class, 'update'])->name('update');
             Route::delete('/{job}', [EmployerJobController::class, 'destroy'])->name('destroy');
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | APPLICATIONS
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('applications')->name('applications.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Employer\ApplicationController::class, 'index'])->name('index');
+            Route::get('/{application}', [\App\Http\Controllers\Employer\ApplicationController::class, 'show'])->name('show');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACCOUNT / PROFILE
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('account')->name('account.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Employer\AccountController::class, 'edit'])->name('edit');
+            Route::post('/', [\App\Http\Controllers\Employer\AccountController::class, 'update'])->name('update');
+        });
+
     });
 
 /*

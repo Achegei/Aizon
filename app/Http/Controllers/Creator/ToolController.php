@@ -11,8 +11,8 @@ class ToolController extends Controller
 {
     public function __construct()
     {
-        // Ensure only authenticated creators can access these routes
-        $this->middleware('auth');
+        // Only authenticated creators can access these routes
+        $this->middleware(['auth', 'creator', 'approved']);
     }
 
     /**
@@ -30,12 +30,7 @@ class ToolController extends Controller
      */
     public function create()
     {
-        $user = auth()->user();
-
-        if (!$user->is_approved) {
-            return redirect()->route('creator.tools.index')
-                ->with('error', 'Your account is pending approval. You cannot create tools yet.');
-        }
+        $this->authorize('create', Tool::class);
 
         return view('creator.tools.create');
     }
@@ -45,12 +40,7 @@ class ToolController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
-
-        if (!$user->is_approved) {
-            return redirect()->route('creator.tools.index')
-                ->with('error', 'Your account is pending approval. You cannot create tools yet.');
-        }
+        $this->authorize('create', Tool::class);
 
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
@@ -60,7 +50,7 @@ class ToolController extends Controller
         ]);
 
         Tool::create([
-            'creator_id'  => $user->id,
+            'creator_id'  => auth()->id(),
             'title'       => $validated['title'],
             'slug'        => $this->generateUniqueSlug($validated['title']),
             'description' => $validated['description'] ?? null,
@@ -128,6 +118,7 @@ class ToolController extends Controller
     protected function generateUniqueSlug(string $title, int $ignoreId = null): string
     {
         $slug = Str::slug($title);
+
         $count = Tool::where('slug', $slug)
             ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
             ->count();

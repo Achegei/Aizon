@@ -22,17 +22,19 @@
             Post New Job
         </a>
 
-        <a href="#"
-           class="block px-4 py-2 rounded hover:bg-gray-100">
-            Applications
+        <a href="{{ route('employer.applications.index') }}"
+        class="block px-4 py-2 rounded hover:bg-gray-100">
+        Applications
         </a>
+
 
         <p class="text-xs text-gray-400 uppercase mt-4 mb-2">Account</p>
 
-        <a href="#"
-           class="block px-4 py-2 rounded hover:bg-gray-100">
-            Profile
+        <a href="{{ route('employer.account.edit') }}"
+        class="block px-4 py-2 rounded hover:bg-gray-100">
+        Profile
         </a>
+
     </nav>
 
     <form method="POST" action="{{ route('logout') }}" class="p-4">

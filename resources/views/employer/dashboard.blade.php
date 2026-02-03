@@ -1,18 +1,59 @@
 @extends('employer.layouts.app')
 
 @section('content')
-<h1 class="text-2xl font-bold mb-4">Employer Dashboard</h1>
-<p>Welcome back, {{ auth()->user()->name }}! Here’s your job posting overview.</p>
+<div class="max-w-5xl mx-auto px-6 py-10">
 
-<!-- Example employer stats cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <div class="bg-white p-4 shadow rounded-lg">
-        <h2 class="font-semibold text-lg">Jobs Posted</h2>
-        <p class="text-gray-500 mt-2">Total jobs posted: 12</p>
+    {{-- Page Header --}}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold tracking-tight text-zinc-900">
+            Employer Dashboard
+        </h1>
+        <p class="mt-2 text-sm text-zinc-500">
+            Welcome back, {{ auth()->user()->name }}! Here's a quick overview of your job postings and applications.
+        </p>
     </div>
-    <div class="bg-white p-4 shadow rounded-lg">
-        <h2 class="font-semibold text-lg">Applications</h2>
-        <p class="text-gray-500 mt-2">Total applications received: 58</p>
+
+    {{-- Stats Cards --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-zinc-900">Jobs Posted</h2>
+                <span class="bg-teal-50 text-teal-700 text-xs font-medium px-2 py-1 rounded-full">
+                    12
+                </span>
+            </div>
+            <p class="mt-3 text-sm text-zinc-500">
+                Total jobs you have posted on the platform.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-zinc-900">Applications</h2>
+                <span class="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-1 rounded-full">
+                    58
+                </span>
+            </div>
+            <p class="mt-3 text-sm text-zinc-500">
+                Total applications received from candidates for your job postings.
+            </p>
+        </div>
     </div>
+
+    {{-- Quick Actions --}}
+    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="{{ route('employer.jobs.create') }}"
+           class="block rounded-lg bg-gradient-to-r from-teal-600 to-emerald-600
+                  px-6 py-4 text-white font-medium shadow hover:opacity-90 transition">
+            ➕ Post a New Job
+        </a>
+
+        <a href="{{ route('employer.jobs.index') }}"
+           class="block rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600
+                  px-6 py-4 text-white font-medium shadow hover:opacity-90 transition">
+            📋 View All Jobs
+        </a>
+    </div>
+
 </div>
 @endsection
