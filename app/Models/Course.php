@@ -19,6 +19,12 @@ class Course extends Model
         'category_id',
         'status',     // 'active' or 'inactive'
         'is_active',  // admin approval flag
+        'is_approved', // approval by admin
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'price' => 'float',
     ];
 
     /*
@@ -54,7 +60,8 @@ class Course extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(\App\Models\Tag::class, 'course_tag', 'course_id', 'tag_id');
+        return $this->belongsToMany(\App\Models\Tag::class, 'course_tag', 'course_id', 'tag_id')
+                    ->withTimestamps();
     }
 
     /*
@@ -82,10 +89,32 @@ class Course extends Model
     protected static function booted()
     {
         static::creating(function ($course) {
-            // Automatically generate slug if not set
             if (empty($course->slug)) {
                 $course->slug = Str::slug($course->title) . '-' . Str::random(6);
             }
         });
+
+        static::creating(function ($course) {
+            if (empty($course->status)) {
+                $course->status = 'inactive';
+            }
+        });
+
+        static::creating(function ($course) {
+            if (!isset($course->is_active)) {
+                $course->is_active = false;
+            }
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route Binding
+    |--------------------------------------------------------------------------
+    */
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

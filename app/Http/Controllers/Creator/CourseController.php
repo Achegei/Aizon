@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Creator;
 
-use Illuminate\Routing\Controller; // ✅ Make sure this is the base Controller
+use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
+    use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
     /**
      * Apply middleware to all routes
      */
     public function __construct()
     {
-        // Only authenticated users who are creators and approved
         $this->middleware(['auth', 'creator', 'approved']);
     }
 
@@ -48,27 +49,34 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,id',
+            'status'      => 'required|in:inactive,active',
         ]);
 
-        Course::create([
+        $course = Course::create([
             'creator_id'  => auth()->id(),
             'title'       => $validated['title'],
             'slug'        => $this->generateUniqueSlug($validated['title']),
             'description' => $validated['description'] ?? null,
             'price'       => $validated['price'],
             'category_id' => $validated['category_id'] ?? null,
+            'status'      => $validated['status'],
+            'is_active'   => $validated['status'] === 'active' ? 1 : 0,
+            'is_approved' => 0, // admin must approve
         ]);
 
         return redirect()->route('creator.courses.index')
-            ->with('success', 'Course created successfully.');
+            ->with('success', 'Course created successfully and pending approval.');
     }
 
     /**
      * Show form to edit a course
+     * Using ID instead of slug
      */
-    public function edit(Course $course)
+    public function edit($id)
     {
-        $this->authorize('update', $course);
+        $course = Course::where('id', $id)
+                        ->where('creator_id', auth()->id())
+                        ->firstOrFail();
 
         return view('creator.courses.edit', compact('course'));
     }
@@ -76,15 +84,18 @@ class CourseController extends Controller
     /**
      * Update a course
      */
-    public function update(Request $request, Course $course)
+    public function update(Request $request, $id)
     {
-        $this->authorize('update', $course);
+        $course = Course::where('id', $id)
+                        ->where('creator_id', auth()->id())
+                        ->firstOrFail();
 
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,id',
+            'status'      => 'required|in:inactive,active',
         ]);
 
         $course->update([
@@ -93,6 +104,9 @@ class CourseController extends Controller
             'description' => $validated['description'] ?? null,
             'price'       => $validated['price'],
             'category_id' => $validated['category_id'] ?? null,
+            'status'      => $validated['status'],
+            'is_active'   => $validated['status'] === 'active' ? 1 : 0,
+            // Keep is_approved as is — admin handles approval
         ]);
 
         return redirect()->route('creator.courses.index')
@@ -102,13 +116,15 @@ class CourseController extends Controller
     /**
      * Delete a course
      */
-    public function destroy(Course $course)
+    public function destroy($id)
     {
-        $this->authorize('delete', $course);
+        $course = Course::where('id', $id)
+                        ->where('creator_id', auth()->id())
+                        ->firstOrFail();
 
         $course->delete();
 
-        return back()->with('success', 'Course deleted.');
+        return back()->with('success', 'Course deleted successfully.');
     }
 
     /**

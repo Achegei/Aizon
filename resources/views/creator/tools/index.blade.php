@@ -16,10 +16,10 @@
     @if($tools->isEmpty())
         <p class="text-gray-600">You haven’t created any tools yet.</p>
     @else
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto bg-white rounded shadow">
             <table class="w-full table-auto border border-gray-200">
-                <thead>
-                    <tr class="bg-gray-100 text-left">
+                <thead class="bg-gray-100">
+                    <tr class="text-left">
                         <th class="px-4 py-2 border">Title</th>
                         <th class="px-4 py-2 border">Category</th>
                         <th class="px-4 py-2 border">Price</th>
@@ -27,9 +27,9 @@
                         <th class="px-4 py-2 border">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y">
                     @foreach($tools as $tool)
-                        <tr class="border-t">
+                        <tr class="hover:bg-gray-50">
                             <td class="px-4 py-2">{{ $tool->title }}</td>
                             <td class="px-4 py-2">{{ $tool->category?->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $tool->formattedPrice() }}</td>
@@ -41,11 +41,16 @@
                                 @endif
                             </td>
                             <td class="px-4 py-2 space-x-2">
-                                <a href="{{ route('creator.tools.edit', $tool->id) }}" class="bg-yellow-400 px-3 py-1 rounded text-white">Edit</a>
-                                <form action="{{ route('creator.tools.destroy', $tool->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this tool?');">
+                                <a href="{{ route('creator.tools.edit', $tool->id) }}" 
+                                   class="bg-yellow-400 px-3 py-1 rounded text-white">Edit</a>
+
+                                <form action="{{ route('creator.tools.destroy', $tool->id) }}" 
+                                      method="POST" class="inline-block" 
+                                      onsubmit="return confirm('Delete this tool?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="bg-red-600 px-3 py-1 rounded text-white">Delete</button>
+                                    <button type="submit" 
+                                            class="bg-red-600 px-3 py-1 rounded text-white">Delete</button>
                                 </form>
                             </td>
                         </tr>

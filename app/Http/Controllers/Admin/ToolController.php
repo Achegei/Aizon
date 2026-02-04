@@ -19,20 +19,24 @@ class ToolController extends Controller
     }
 
     /**
-     * Show the form for creating a new tool (optional for admin).
-     */
-    public function create()
-    {
-        return view('admin.tools.create');
-    }
-
-    /**
      * Show the form for editing a tool (optional for admin).
      */
     public function edit(Tool $tool)
     {
         return view('admin.tools.edit', compact('tool'));
     }
+
+    /**
+     * Display a specific tool.
+     */
+    public function show(Tool $tool)
+    {
+        // Load creator relationship if needed
+        $tool->load('creator');
+
+        return view('admin.tools.show', compact('tool'));
+    }
+
 
     /**
      * Approve a tool (set as active).

@@ -22,7 +22,7 @@ class UserController extends Controller
             UserRole::ADMIN->value,
             UserRole::CREATOR->value,
             UserRole::EMPLOYER->value,
-            UserRole::BUYER->value,
+            UserRole::MEMBER->value,
         ];
 
         return view('admin.users.create', compact('roles'));
@@ -64,7 +64,7 @@ class UserController extends Controller
             UserRole::ADMIN->value,
             UserRole::CREATOR->value,
             UserRole::EMPLOYER->value,
-            UserRole::BUYER->value,
+            UserRole::MEMBER->value,
         ];
 
         return view('admin.users.edit', compact('user', 'roles'));

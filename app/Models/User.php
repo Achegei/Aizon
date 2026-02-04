@@ -86,10 +86,11 @@ class User extends Authenticatable
         return $this->role === UserRole::EMPLOYER;
     }
 
-    public function isBuyer(): bool
+    public function isMember(): bool
     {
-        return $this->role === UserRole::BUYER;
+        return $this->role === UserRole::MEMBER;
     }
+
 
     /*
     |--------------------------------------------------------------------------

@@ -32,6 +32,26 @@
             Create Tool
         </a>
 
+        <!-- NEW SECTION -->
+        <p class="text-xs text-gray-400 uppercase mt-4 mb-2">
+            Sales & Engagement
+        </p>
+
+        <a href="{{ route('creator.analytics.enrollments.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-100">
+            Course Enrollments
+        </a>
+
+        <a href="#"
+           class="block px-4 py-2 rounded hover:bg-gray-100">
+            Tool Purchases
+        </a>
+
+        <a href="{{ route('creator.earnings.index') }}"
+           class="block px-4 py-2 rounded hover:bg-gray-100">
+            Earnings
+        </a>
+
         <p class="text-xs text-gray-400 uppercase mt-4 mb-2">Account</p>
 
         @if (\Illuminate\Support\Facades\Route::has('creator.profile'))

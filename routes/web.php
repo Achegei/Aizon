@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\EnrollmentController;
 
 // Auth
 use App\Http\Controllers\Auth\LoginController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\CourseController;
 
 // Admin
 use App\Http\Controllers\Admin\LoginController as AdminLogin;
@@ -25,6 +27,8 @@ use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 
 // Creator
 use App\Http\Controllers\Creator\DashboardController as CreatorDashboard;
+use App\Http\Controllers\Creator\EnrollmentController as CreatorEnrollmentController;
+
 
 // Employer
 use App\Http\Controllers\Employer\DashboardController as EmployerDashboard;
@@ -38,6 +42,11 @@ use App\Http\Controllers\Employer\JobController as EmployerJobController;
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/ai-tools', [PageController::class, 'aiTools'])->name('public.tools.index');
 Route::get('/courses', [PageController::class, 'courses'])->name('public.courses.index');
+// Enrollment POST route
+Route::post('/courses/{course:slug}/enroll', [EnrollmentController::class, 'store'])
+    ->name('courses.enroll')
+    ->middleware('auth');
+Route::get('/courses/{course:slug}', [PageController::class, 'courseShow'])->name('public.courses.show');
 Route::get('/jobs', [PageController::class, 'jobs'])->name('public.jobs.index');
 Route::get('/jobs/{job}', [PageController::class, 'jobShow'])->name('public.jobs.show');
 Route::get('/hire-talent', [PageController::class, 'hireTalent'])->name('public.hire.index');
@@ -127,6 +136,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::get('tools', [AdminToolController::class, 'index'])->name('tools.index');
+        Route::get('tools/{tool}', [AdminToolController::class, 'show'])->name('tools.show'); // <--- new
         Route::patch('tools/{tool}/approve', [AdminToolController::class, 'approve'])->name('tools.approve');
         Route::patch('tools/{tool}/disapprove', [AdminToolController::class, 'disapprove'])->name('tools.disapprove');
         Route::delete('tools/{tool}', [AdminToolController::class, 'destroy'])->name('tools.destroy');
@@ -137,9 +147,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::get('courses', [AdminCourseController::class, 'index'])->name('courses.index');
+        Route::get('courses/{course}', [AdminCourseController::class, 'show'])->name('courses.show');
         Route::patch('courses/{course}/approve', [AdminCourseController::class, 'approve'])->name('courses.approve');
         Route::patch('courses/{course}/disapprove', [AdminCourseController::class, 'disapprove'])->name('courses.disapprove');
         Route::delete('courses/{course}', [AdminCourseController::class, 'destroy'])->name('courses.destroy');
+        
 
         /*
         |--------------------------------------------------------------------------
@@ -173,8 +185,13 @@ Route::middleware(['auth', 'creator', 'approved'])
     ->name('creator.')
     ->group(function () {
 
-        // Dashboard
-        Route::get('/dashboard', [CreatorDashboard::class, 'index'])->name('dashboard');
+        /*
+        |--------------------------------------------------------------------------
+        | DASHBOARD
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/dashboard', [CreatorDashboard::class, 'index'])
+            ->name('dashboard');
 
         /*
         |--------------------------------------------------------------------------
@@ -194,20 +211,44 @@ Route::middleware(['auth', 'creator', 'approved'])
         |--------------------------------------------------------------------------
         | CREATOR COURSES
         |--------------------------------------------------------------------------
+        | Using {id} avoids slug conflicts with public routes
         */
         Route::prefix('courses')->name('courses.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Creator\CourseController::class, 'index'])->name('index'); // List all courses
-            Route::get('/create', [\App\Http\Controllers\Creator\CourseController::class, 'create'])->name('create'); // Show create form
-            Route::post('/', [\App\Http\Controllers\Creator\CourseController::class, 'store'])->name('store'); // Store new course
-            Route::get('/{course}/edit', [\App\Http\Controllers\Creator\CourseController::class, 'edit'])->name('edit'); // Show edit form
-            Route::put('/{course}', [\App\Http\Controllers\Creator\CourseController::class, 'update'])->name('update'); // Update course
-            Route::delete('/{course}', [\App\Http\Controllers\Creator\CourseController::class, 'destroy'])->name('destroy'); // Delete course
+            Route::get('/', [\App\Http\Controllers\Creator\CourseController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Creator\CourseController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Creator\CourseController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [\App\Http\Controllers\Creator\CourseController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [\App\Http\Controllers\Creator\CourseController::class, 'update'])->name('update');
+            Route::delete('/{id}', [\App\Http\Controllers\Creator\CourseController::class, 'destroy'])->name('destroy');
         });
 
-        // Earnings
-        Route::get('/earnings', [\App\Http\Controllers\Creator\EarningsController::class, 'index'])->name('earnings.index');
-    });
+        /*
+        |--------------------------------------------------------------------------
+        | CREATOR ANALYTICS / SALES VISIBILITY
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('analytics')->name('analytics.')->group(function () {
 
+            // Who enrolled in my courses
+            Route::get('/enrollments',
+                [\App\Http\Controllers\Creator\EnrollmentController::class, 'index']
+            )->name('enrollments.index');
+
+            // Who purchased my tools
+            Route::get('/tool-purchases',
+                [\App\Http\Controllers\Creator\ToolPurchaseController::class, 'index']
+            )->name('tool-purchases.index');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREATOR EARNINGS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/earnings',
+            [\App\Http\Controllers\Creator\EarningsController::class, 'index']
+        )->name('earnings.index');
+    });
 
 /*
 |--------------------------------------------------------------------------

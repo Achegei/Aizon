@@ -2,40 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Course;
 use App\Models\JobListing;
+use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
     public function home()
     {
-        // Optional: Pass demo data for tools/courses/jobs if backend exists
         return view('pages.home');
     }
 
     public function aiTools()
     {
-        // Fetch real tools once backend exists
         $tools = []; // placeholder
         return view('pages.ai-tools', compact('tools'));
     }
 
+    /**
+     * Public course listing
+     * Only approved & active courses
+     */
     public function courses()
     {
-        $courses = [];
+        $courses = Course::with('creator')
+            ->where('is_approved', true)   // admin has approved it
+            ->where('is_active', true)     // course is marked active
+            ->where('status', 'active')    // status is 'active' (optional safety)
+            ->latest()
+            ->get();
+
         return view('pages.courses', compact('courses'));
     }
 
+
+    /**
+     * Public single course page
+     */
+    public function courseShow(Course $course)
+        {
+            // Only show active & approved courses
+            if (!$course->isActive()) {
+                abort(404);
+            }
+
+            return view('pages.course-single', compact('course'));
+        }
+
+
+    /**
+     * Public jobs listing
+     */
     public function jobs()
     {
-        // Fetch active jobs only, latest first
-        $jobs = JobListing::with('employer')->where('is_active', true)->latest()->get();
+        $jobs = JobListing::with('employer')
+            ->where('is_active', true)
+            ->latest()
+            ->get();
+
         return view('pages.jobs', compact('jobs'));
     }
 
-    // ✅ New method to show a single job
+    /**
+     * Public single job page
+     */
     public function jobShow(JobListing $job)
     {
+        if (!$job->is_active) {
+            abort(404);
+        }
+
         return view('pages.job-show', compact('job'));
     }
 

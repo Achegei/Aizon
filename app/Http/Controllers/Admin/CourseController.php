@@ -3,48 +3,60 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Course;
 
 class CourseController extends Controller
 {
     /**
-     * Display a listing of courses.
+     * Display all courses (admin list)
      */
     public function index()
     {
-        $courses = Course::latest()->get();
+        $courses = Course::with('creator')
+            ->latest()
+            ->get();
+
         return view('admin.courses.index', compact('courses'));
     }
 
     /**
-     * Approve a course (admin action).
+     * View a course in full (admin preview)
+     */
+    public function show(Course $course)
+    {
+        return view('admin.courses.show', compact('course'));
+    }
+
+    /**
+     * Approve a course
      */
     public function approve(Course $course)
     {
         $course->update([
-            'is_active' => true,
-            'status' => 'active', // optional: ensure status aligns
+            'is_approved' => true,
+            'is_active'   => true,
+            'status'      => 'active',
         ]);
 
         return back()->with('success', 'Course approved successfully.');
     }
 
     /**
-     * Disapprove a course (admin action).
+     * Unapprove / Disapprove a course
      */
     public function disapprove(Course $course)
     {
         $course->update([
-            'is_active' => false,
-            'status' => 'inactive', // optional: keep status in sync
+            'is_approved' => false,
+            'is_active'   => false,
+            'status'      => 'pending',
         ]);
 
-        return back()->with('success', 'Course disapproved successfully.');
+        return back()->with('success', 'Course unapproved successfully.');
     }
 
     /**
-     * Delete a course.
+     * Delete a course
      */
     public function destroy(Course $course)
     {

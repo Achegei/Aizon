@@ -29,15 +29,15 @@ class RegisterController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|confirmed|min:8',
-            'role'     => 'required|in:creator,employer,buyer', // must match enum values
+            'role'     => 'required|in:creator,employer,member', // must match enum values
         ]);
 
         // Convert role string to enum
         $roleEnum = UserRole::from($validated['role']);
 
         // Determine if user should be auto-approved
-        // Only buyers are auto-approved, creators/employers need admin approval
-        $isApproved = $roleEnum === UserRole::BUYER ? true : false;
+        // Only members are auto-approved, creators/employers need admin approval
+        $isApproved = $roleEnum === UserRole::MEMBER ? true : false;
 
         // Create user
         $user = User::create([
@@ -56,9 +56,8 @@ class RegisterController extends Controller
         return match($user->role) {
             UserRole::CREATOR => redirect()->route('creator.dashboard'),
             UserRole::EMPLOYER => redirect()->route('employer.dashboard'),
-            UserRole::BUYER => redirect()->route('buyer.dashboard'),
+            UserRole::MEMBER => redirect('/'),
             UserRole::ADMIN, UserRole::SUPER_ADMIN, UserRole::STAFF => redirect()->route('admin.dashboard'),
-            default => abort(403, 'Unauthorized'),
         };
     }
 }

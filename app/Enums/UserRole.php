@@ -1,5 +1,6 @@
 <?php
 // app/Enums/UserRole.php
+
 namespace App\Enums;
 
 enum UserRole: string
@@ -7,10 +8,10 @@ enum UserRole: string
     // Admin levels
     case SUPER_ADMIN = 'super_admin';
     case ADMIN       = 'admin';
-    case STAFF       = 'staff'; // regular admin user with limited permissions
+    case STAFF       = 'staff';
 
     // Platform users
-    case CREATOR     = 'creator';
-    case EMPLOYER    = 'employer';
-    case BUYER       = 'buyer';
+    case MEMBER      = 'member';   // universal base user
+    case CREATOR     = 'creator';  // upgraded member
+    case EMPLOYER    = 'employer'; // upgraded member
 }
