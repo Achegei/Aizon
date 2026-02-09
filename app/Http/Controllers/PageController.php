@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\JobListing;
 use Illuminate\Http\Request;
+use App\Models\Tool;
 
 class PageController extends Controller
 {
@@ -15,9 +16,29 @@ class PageController extends Controller
 
     public function aiTools()
     {
-        $tools = []; // placeholder
+        $tools = Tool::with('creator')
+            ->where('is_active', true)      // tool is active
+            ->where('is_approved', true)    // admin has approved it
+            ->where('status', 'active')     // optional safety check
+            ->latest()
+            ->get();
+
         return view('pages.ai-tools', compact('tools'));
     }
+
+
+    
+    public function showTool(Tool $tool)
+        {
+            // Only show tools that are active AND approved
+            if (!$tool->isActive()) {
+                abort(404);
+            }
+
+            return view('pages.tool-show', compact('tool'));
+        }
+
+
 
     /**
      * Public course listing

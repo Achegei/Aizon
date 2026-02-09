@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\Creator\ToolRequestController;
 
 // Admin
 use App\Http\Controllers\Admin\LoginController as AdminLogin;
@@ -41,6 +42,11 @@ use App\Http\Controllers\Employer\JobController as EmployerJobController;
 */
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/ai-tools', [PageController::class, 'aiTools'])->name('public.tools.index');
+// Tool Request POST route (like enrollment)
+Route::post('/ai-tools/{tool:slug}/request', [\App\Http\Controllers\Creator\ToolRequestController::class, 'store'])
+    ->name('tools.request')
+    ->middleware('auth');
+Route::get('/ai-tools/{tool:slug}', [PageController::class, 'showTool'])->name('public.tools.show');
 Route::get('/courses', [PageController::class, 'courses'])->name('public.courses.index');
 // Enrollment POST route
 Route::post('/courses/{course:slug}/enroll', [EnrollmentController::class, 'store'])
@@ -136,10 +142,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         |--------------------------------------------------------------------------
         */
         Route::get('tools', [AdminToolController::class, 'index'])->name('tools.index');
-        Route::get('tools/{tool}', [AdminToolController::class, 'show'])->name('tools.show'); // <--- new
-        Route::patch('tools/{tool}/approve', [AdminToolController::class, 'approve'])->name('tools.approve');
-        Route::patch('tools/{tool}/disapprove', [AdminToolController::class, 'disapprove'])->name('tools.disapprove');
-        Route::delete('tools/{tool}', [AdminToolController::class, 'destroy'])->name('tools.destroy');
+        Route::get('tools/{tool:id}', [AdminToolController::class, 'show'])->name('tools.show');
+        Route::patch('tools/{tool:id}/approve', [AdminToolController::class, 'approve'])->name('tools.approve');
+        Route::patch('tools/{tool:id}/disapprove', [AdminToolController::class, 'disapprove'])->name('tools.disapprove');
+        Route::delete('tools/{tool:id}', [AdminToolController::class, 'destroy'])->name('tools.destroy');
 
         /*
         |--------------------------------------------------------------------------
@@ -199,12 +205,21 @@ Route::middleware(['auth', 'creator', 'approved'])
         |--------------------------------------------------------------------------
         */
         Route::prefix('tools')->name('tools.')->group(function () {
+            // List all tools
             Route::get('/', [\App\Http\Controllers\Creator\ToolController::class, 'index'])->name('index');
+
+            // Create new tool
             Route::get('/create', [\App\Http\Controllers\Creator\ToolController::class, 'create'])->name('create');
             Route::post('/', [\App\Http\Controllers\Creator\ToolController::class, 'store'])->name('store');
+
+            // Edit / Update / Delete
             Route::get('/{tool}/edit', [\App\Http\Controllers\Creator\ToolController::class, 'edit'])->name('edit');
             Route::put('/{tool}', [\App\Http\Controllers\Creator\ToolController::class, 'update'])->name('update');
             Route::delete('/{tool}', [\App\Http\Controllers\Creator\ToolController::class, 'destroy'])->name('destroy');
+
+            // List all requests for creator
+            Route::get('/requests', [\App\Http\Controllers\Creator\ToolRequestController::class, 'index'])
+                ->name('requests.index');
         });
 
         /*
@@ -228,16 +243,13 @@ Route::middleware(['auth', 'creator', 'approved'])
         |--------------------------------------------------------------------------
         */
         Route::prefix('analytics')->name('analytics.')->group(function () {
-
             // Who enrolled in my courses
-            Route::get('/enrollments',
-                [\App\Http\Controllers\Creator\EnrollmentController::class, 'index']
-            )->name('enrollments.index');
+            Route::get('/enrollments', [\App\Http\Controllers\Creator\EnrollmentController::class, 'index'])
+                ->name('enrollments.index');
 
             // Who purchased my tools
-            Route::get('/tool-purchases',
-                [\App\Http\Controllers\Creator\ToolPurchaseController::class, 'index']
-            )->name('tool-purchases.index');
+            //Route::get('/tool-purchases', [\App\Http\Controllers\Creator\ToolPurchaseController::class, 'index'])
+                //->name('tool-purchases.index');
         });
 
         /*
@@ -245,9 +257,8 @@ Route::middleware(['auth', 'creator', 'approved'])
         | CREATOR EARNINGS
         |--------------------------------------------------------------------------
         */
-        Route::get('/earnings',
-            [\App\Http\Controllers\Creator\EarningsController::class, 'index']
-        )->name('earnings.index');
+        Route::get('/earnings', [\App\Http\Controllers\Creator\EarningsController::class, 'index'])
+            ->name('earnings.index');
     });
 
 /*

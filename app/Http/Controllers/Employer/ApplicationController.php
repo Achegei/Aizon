@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Employer;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
-use App\Models\JobListing; // Make sure this is imported
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
@@ -14,9 +13,9 @@ class ApplicationController extends Controller
      */
     public function index()
     {
-        $applications = JobApplication::with('job') // make sure relationship exists
-            ->whereHas('job', function ($q) {
-                $q->where('employer_id', auth()->id());
+        $applications = JobApplication::with(['job', 'user'])
+            ->whereHas('job', function ($query) {
+                $query->where('employer_id', auth()->id());
             })
             ->latest()
             ->get();
@@ -29,7 +28,10 @@ class ApplicationController extends Controller
      */
     public function show(JobApplication $application)
     {
-        // Ensure the employer owns the job related to this application
+        // Eager load relationships so policy checks work
+        $application->load('job', 'user');
+
+        // Authorization: employer can view only their own job applications
         $this->authorize('view', $application);
 
         return view('employer.applications.show', compact('application'));

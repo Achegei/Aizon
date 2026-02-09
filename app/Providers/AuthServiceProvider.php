@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Providers;
+use App\Models\JobApplication;
+use App\Policies\JobApplicationPolicy;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -25,12 +27,13 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Tool::class    => ToolPolicy::class,
-        Course::class  => CoursePolicy::class,
-        Job::class     => JobPolicy::class,
-        Order::class   => OrderPolicy::class,
-        Payout::class  => PayoutPolicy::class,
-    ];
+           Tool::class            => ToolPolicy::class,
+            Course::class          => CoursePolicy::class,
+            Job::class             => JobPolicy::class,
+            JobApplication::class  => JobApplicationPolicy::class, // <-- ADD THIS
+            Order::class           => OrderPolicy::class,
+            Payout::class          => PayoutPolicy::class,
+            ];
 
     /**
      * Register any authentication / authorization services.

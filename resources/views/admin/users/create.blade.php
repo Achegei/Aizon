@@ -1,5 +1,5 @@
 {{-- resources/views/admin/users/create.blade.php --}}
-@extends('layouts.dashboard')
+@extends('layouts.admin')
 
 @section('title', 'Create New User')
 @section('page-title', 'Create New User')

@@ -22,6 +22,8 @@ class Tool extends Model
         'category_id',
         'status',      // 'active' or 'inactive'
         'is_active',   // boolean for admin approval
+        'is_approved',
+        'thumbnail',
     ];
 
     /**
@@ -73,6 +75,14 @@ class Tool extends Model
     | Helpers
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Use slug for route model binding instead of ID
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     /**
      * Check if tool is active (creator + admin approved).

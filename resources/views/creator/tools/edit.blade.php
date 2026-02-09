@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('creator.layouts.app')
 
 @section('content')
 <div class="container mx-auto p-6">
@@ -59,13 +59,29 @@
         <!-- Tags -->
         <div class="mb-4">
             <label class="block mb-1 font-semibold">Tags (comma-separated)</label>
-            <input type="text" name="tags" value="{{ old('tags', $tool->tags->pluck('name')->implode(',')) }}" class="w-full border px-3 py-2 rounded">
+            @php
+                $tags = '';
+                try {
+                    if (method_exists($tool, 'tags') && $tool->relationLoaded('tags')) {
+                        $tags = optional($tool->tags)->pluck('name')->implode(',');
+                    }
+                } catch (\Throwable $e) {
+                    $tags = '';
+                }
+            @endphp
+            <input
+                type="text"
+                name="tags"
+                value="{{ old('tags', $tags) }}"
+                class="w-full border px-3 py-2 rounded"
+                placeholder="ai, productivity, writing"
+            >
         </div>
 
         <!-- Thumbnail -->
         <div class="mb-4">
             <label class="block mb-1 font-semibold">Thumbnail</label>
-            @if($tool->thumbnail)
+            @if(!empty($tool->thumbnail))
                 <div class="mb-2">
                     <img src="{{ asset('storage/'.$tool->thumbnail) }}" alt="Thumbnail" class="w-32 h-32 object-cover rounded">
                 </div>
@@ -76,15 +92,29 @@
         <!-- Additional Media -->
         <div class="mb-4">
             <label class="block mb-1 font-semibold">Additional Media</label>
-            @if($tool->media->count())
+            @php
+                $mediaItems = [];
+                try {
+                    if (method_exists($tool, 'media') && $tool->relationLoaded('media')) {
+                        $mediaItems = $tool->media;
+                    }
+                } catch (\Throwable $e) {
+                    $mediaItems = [];
+                }
+            @endphp
+
+            @if(count($mediaItems))
                 <div class="mb-2 flex flex-wrap gap-2">
-                    @foreach($tool->media as $media)
-                        <div class="relative">
-                            <img src="{{ asset('storage/'.$media->path) }}" alt="Media" class="w-24 h-24 object-cover rounded">
-                        </div>
+                    @foreach($mediaItems as $media)
+                        @if(!empty($media->path))
+                            <div class="relative">
+                                <img src="{{ asset('storage/'.$media->path) }}" alt="Media" class="w-24 h-24 object-cover rounded">
+                            </div>
+                        @endif
                     @endforeach
                 </div>
             @endif
+
             <input type="file" name="media[]" multiple class="w-full border px-3 py-2 rounded">
         </div>
 

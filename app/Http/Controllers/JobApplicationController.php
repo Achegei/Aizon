@@ -10,24 +10,28 @@ class JobApplicationController extends Controller
 {
     public function store(Request $request, JobListing $job)
     {
+        // ✅ Validate input
         $request->validate([
             'cover_letter' => 'required|string|max:2000',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
+        // ✅ Handle CV upload
         $cvPath = null;
         if ($request->hasFile('cv')) {
             $cvPath = $request->file('cv')->store('cvs', 'public');
         }
 
+        // ✅ Create application (job_id FIXED)
         JobApplication::create([
-            'job_post_id' => $job->id,  // <-- matches your column
-            'user_id' => $request->user()->id,
-            'cover_letter' => $request->cover_letter,
-            'cv_path' => $cvPath,
-            'status' => 'pending', // default status
+            'job_id'            => $job->id,            // 🔥 REQUIRED
+            'user_id'           => auth()->id(),
+            'cover_letter_text' => $request->cover_letter,
+            'cv_path'           => $cvPath,
+            'status'            => 'pending',
         ]);
 
-        return back()->with('success', 'Your application has been submitted!');
+        // ✅ Redirect back with success
+        return redirect()->back()->with('success', 'Your application has been submitted successfully.');
     }
 }

@@ -1,5 +1,5 @@
 {{-- resources/views/admin/users/edit.blade.php --}}
-@extends('layouts.dashboard')
+@extends('layouts.admin')
 
 @section('title', 'Edit User: ' . $user->name)
 @section('page-title', 'Edit User: ' . $user->name)

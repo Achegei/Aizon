@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\JobListing;
+use App\Models\User;
 
 class JobApplication extends Model
 {
@@ -12,14 +13,15 @@ class JobApplication extends Model
 
     protected $fillable = [
         'user_id',
-        'job_post_id', // matches your table
-        'cover_letter',
+        'job_id',              // ✅ correct FK
         'cv_path',
-        'status', // optional: pending, accepted, rejected
+        'cover_letter_path',
+        'cover_letter_text',
+        'status',              // pending, accepted, rejected
     ];
 
     /**
-     * Applicant
+     * Applicant (the user who applied)
      */
     public function user()
     {
@@ -31,6 +33,6 @@ class JobApplication extends Model
      */
     public function job()
     {
-        return $this->belongsTo(JobListing::class, 'job_post_id'); // <-- specify custom FK
+        return $this->belongsTo(JobListing::class, 'job_id'); // ✅ FIXED
     }
 }

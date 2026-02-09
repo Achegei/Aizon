@@ -39,23 +39,32 @@ class ToolController extends Controller
 
 
     /**
-     * Approve a tool (set as active).
+     * Approve a tool
      */
     public function approve(Tool $tool)
     {
-        $tool->update(['is_active' => true]);
+        $tool->update([
+            'is_approved' => true,     // admin approval flag
+            'is_active'   => true,     // tool becomes active
+            'status'      => 'active', // optional status
+        ]);
+
         return back()->with('success', 'Tool approved successfully.');
     }
 
     /**
-     * Disapprove a tool (set as inactive).
+     * Unapprove / Disapprove a tool
      */
     public function disapprove(Tool $tool)
     {
-        $tool->update(['is_active' => false]);
+        $tool->update([
+            'is_approved' => false,    // remove admin approval
+            'is_active'   => false,    // tool becomes inactive
+            'status'      => 'inactive', // optional status
+        ]);
+
         return back()->with('success', 'Tool disapproved successfully.');
     }
-
     /**
      * Delete a tool permanently.
      */

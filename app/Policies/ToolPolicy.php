@@ -74,4 +74,15 @@ class ToolPolicy
     {
         return $user->isAdmin();
     }
+
+    /**
+ * Any logged-in user can request a tool
+ */
+    // ToolPolicy.php
+    public function request(User $user, Tool $tool): bool
+    {
+        return $user->id !== $tool->creator_id;
+    }
+
+
 }

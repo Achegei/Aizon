@@ -56,6 +56,8 @@ class ToolController extends Controller
             'description' => $validated['description'] ?? null,
             'price'       => $validated['price'],
             'category_id' => $validated['category_id'] ?? null,
+            'status'      => 'inactive', // default to inactive
+            'is_active'   => false,      // default admin approval
         ]);
 
         return redirect()
@@ -85,15 +87,50 @@ class ToolController extends Controller
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,id',
+            'status'      => 'required|in:active,inactive',
+            'tags'        => 'nullable|string',
+            'thumbnail'   => 'nullable|image|max:2048',
+            'media.*'     => 'nullable|image|max:2048',
         ]);
 
+        // 1️⃣ Update main tool attributes including status
         $tool->update([
             'title'       => $validated['title'],
             'slug'        => $this->generateUniqueSlug($validated['title'], $tool->id),
-            'description' => $validated['description'] ?? null,
+            'description' => $validated['description'] ?? $tool->description,
             'price'       => $validated['price'],
             'category_id' => $validated['category_id'] ?? null,
+            'status'      => $validated['status'],
         ]);
+
+        // 2️⃣ Handle tags (comma-separated)
+        if (!empty($validated['tags'])) {
+            $tags = collect(explode(',', $validated['tags']))
+                ->map(fn($t) => trim($t))
+                ->filter();
+            $tagIds = [];
+            foreach ($tags as $tagName) {
+                $tag = \App\Models\Tag::firstOrCreate(['name' => $tagName]);
+                $tagIds[] = $tag->id;
+            }
+            $tool->tags()->sync($tagIds);
+        } else {
+            $tool->tags()->detach();
+        }
+
+        // 3️⃣ Handle thumbnail upload
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('tools/thumbnails', 'public');
+            $tool->update(['thumbnail' => $path]);
+        }
+
+        // 4️⃣ Handle additional media uploads
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $mediaFile) {
+                $path = $mediaFile->store('tools/media', 'public');
+                $tool->media()->create(['path' => $path]);
+            }
+        }
 
         return redirect()
             ->route('creator.tools.index')

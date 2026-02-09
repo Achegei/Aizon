@@ -1,5 +1,5 @@
 {{-- resources/views/admin/layouts/roles-permissions.blade.php --}}
-@extends('layouts.dashboard')
+@extends('layouts.admin')
 
 @section('title', $title ?? 'Roles & Permissions')
 @section('page-title', $title ?? 'Roles & Permissions')

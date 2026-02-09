@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        $users = User::orderBy('id', 'desc')->get();
-        return view('admin.users.index', compact('users'));
-    }
+   public function index()
+{
+    $users = User::orderBy('id', 'desc')->paginate(10);
+
+    return view('admin.users.index', compact('users'));
+}
+
 
     public function create()
     {
