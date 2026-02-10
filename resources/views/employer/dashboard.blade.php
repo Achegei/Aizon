@@ -1,6 +1,14 @@
 @extends('employer.layouts.app')
 
 @section('content')
+@php
+    // Get counts dynamically
+    $jobsPostedCount = \App\Models\JobListing::where('employer_id', auth()->id())->count();
+    $applicationsCount = \App\Models\JobApplication::whereHas('job', function ($query) {
+        $query->where('employer_id', auth()->id());
+    })->count();
+@endphp
+
 <div class="max-w-5xl mx-auto px-6 py-10">
 
     {{-- Page Header --}}
@@ -19,7 +27,7 @@
             <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-zinc-900">Jobs Posted</h2>
                 <span class="bg-teal-50 text-teal-700 text-xs font-medium px-2 py-1 rounded-full">
-                    12
+                    {{ $jobsPostedCount }}
                 </span>
             </div>
             <p class="mt-3 text-sm text-zinc-500">
@@ -31,7 +39,7 @@
             <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-zinc-900">Applications</h2>
                 <span class="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-1 rounded-full">
-                    58
+                    {{ $applicationsCount }}
                 </span>
             </div>
             <p class="mt-3 text-sm text-zinc-500">

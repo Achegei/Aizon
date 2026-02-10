@@ -1,29 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-
-<!-- Hero Section -->
-<section class="py-20 md:py-32 text-center bg-gradient-to-r from-purple-600 to-indigo-500 px-4 sm:px-6 lg:px-8 rounded-b-3xl shadow-lg">
-    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white">
-        Explore Our AI Courses
-    </h1>
-    <p class="mt-4 text-white/90 max-w-3xl mx-auto text-lg sm:text-xl">
-        Learn AI skills from beginner to advanced. Browse courses created by expert instructors.
-    </p>
-    <a href="#courses"
-       class="mt-8 px-8 py-4 bg-white text-purple-600 font-semibold rounded-xl shadow-lg hover:shadow-xl transition duration-300 inline-block">
-        Browse Courses
-    </a>
-</section>
-
 <!-- Courses Grid -->
 <section id="courses" class="py-16 md:py-24 px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
         @forelse($courses as $course)
             <div class="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition border border-gray-200 flex flex-col justify-between p-6">
-                <img src="{{ $course->thumbnail_url ?? 'https://via.placeholder.com/400x200?text=Course+Thumbnail' }}"
-                     alt="{{ $course->title }}"
-                     class="rounded-2xl mb-4 w-full object-cover h-48">
+                
+                {{-- Removed image --}}
                 <h3 class="text-2xl font-bold text-gray-900">{{ $course->title }}</h3>
                 <p class="text-gray-500 mt-1 text-sm">
                     By {{ optional($course->creator)->name ?? 'Unknown Instructor' }}
@@ -51,6 +35,20 @@
             </p>
         @endforelse
     </div>
+</section>
+
+<!-- Hero Section -->
+<section class="py-20 md:py-32 text-center bg-gradient-to-r from-purple-600 to-indigo-500 px-4 sm:px-6 lg:px-8 rounded-b-3xl shadow-lg">
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white">
+        Explore Our AI Courses
+    </h1>
+    <p class="mt-4 text-white/90 max-w-3xl mx-auto text-lg sm:text-xl">
+        Learn AI skills from beginner to advanced. Browse courses created by expert instructors.
+    </p>
+    <a href="{{ route('public.courses.index') }}"
+       class="mt-8 px-8 py-4 bg-white text-purple-600 font-semibold rounded-xl shadow-lg hover:shadow-xl transition duration-300 inline-block">
+        Browse Courses
+    </a>
 </section>
 
 @endsection

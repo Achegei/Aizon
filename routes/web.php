@@ -296,6 +296,10 @@ Route::middleware(['auth', 'employer', 'approved'])
         Route::prefix('applications')->name('applications.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Employer\ApplicationController::class, 'index'])->name('index');
             Route::get('/{application}', [\App\Http\Controllers\Employer\ApplicationController::class, 'show'])->name('show');
+
+             // ✅ Add this PATCH route for updating application status
+        Route::patch('/{application}/status', [\App\Http\Controllers\Employer\ApplicationController::class, 'updateStatus'])
+        ->name('updateStatus');
         });
 
         /*

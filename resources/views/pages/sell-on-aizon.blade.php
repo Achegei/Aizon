@@ -9,7 +9,7 @@
     <p class="mt-4 text-gray-200 max-w-3xl mx-auto">
         List AI tools, automations, prompts, mini-courses, and templates. Earn globally.
     </p>
-    <a href="#" class="mt-6 px-6 py-3 bg-white text-purple-700 rounded-lg font-semibold shadow-lg hover:bg-gray-100 transition duration-300 inline-block">
+    <a href="{{ route('register') }}" class="mt-6 px-6 py-3 bg-white text-purple-700 rounded-lg font-semibold shadow-lg hover:bg-gray-100 transition duration-300 inline-block">
         Become a Creator
     </a>
 </section>

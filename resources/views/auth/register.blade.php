@@ -43,17 +43,30 @@
         </div>
 
         <!-- Role -->
-        <div>
-            <label for="role" class="block font-semibold mb-1">Role</label>
-            <select name="role" required>
-                <option value="">Select Role</option>
-                <option value="creator">CREATOR</option>
-                <option value="employer">EMPLOYER</option>
-                <option value="buyer">BUYER</option>
+        <div class="bg-purple-50 border border-purple-300 rounded-lg p-4">
+            <label for="role" class="block font-semibold mb-2 text-purple-800">
+                Choose Your Role
+            </label>
+
+            <select
+                name="role"
+                required
+                class="w-full rounded-md border-2 border-purple-400 bg-white px-4 py-3 
+                    text-gray-800 font-semibold
+                    focus:border-purple-600 focus:ring-2 focus:ring-purple-300
+                    transition duration-200"
+            >
+                <option value="" class="text-gray-400">— Select Role —</option>
+                <option value="creator">Creator (Sell tools & courses)</option>
+                <option value="employer">Employer (Post jobs & hire)</option>
+                <option value="member">Member (Buy tools, courses & Apply for Jobs)</option>
             </select>
 
-            @error('role') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            @error('role')
+                <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+            @enderror
         </div>
+
 
         <!-- Submit Button -->
         <div>

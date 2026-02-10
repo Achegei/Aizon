@@ -14,11 +14,34 @@
         learners master AI skills, and employers hire AI talent.
     </p>
     <div class="mt-6 md:mt-10 flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
-        <a href="#" class="px-6 py-3 bg-white text-purple-700 rounded-lg font-semibold shadow-lg hover:bg-gray-100 transition duration-300">Explore AI Tools</a>
-        <a href="#" class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">Hire AI Talent</a>
-        <a href="#" class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">Enroll in AI Courses</a>
-        <a href="#" class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">Post AI Jobs</a>
-    </div>
+
+    <a href="{{ route('public.tools.index') }}"
+       class="px-6 py-3 bg-white text-purple-700 rounded-lg font-semibold shadow-lg hover:bg-gray-100 transition duration-300">
+       Get the Right AI Tool for Your Business
+    </a>
+
+    <a href="{{ route('public.jobs.index') }}"
+       class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">
+       Find an AI Job
+    </a>
+
+    <a href="{{ route('public.courses.index') }}"
+       class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">
+       Enroll in AI Courses
+    </a>
+
+    <a href="{{ route('register') }}"
+       class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">
+       Post AI Jobs
+    </a>
+
+    <a href="{{ route('register') }}"
+       class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-700 transition duration-300">
+       Sell AI Tools & Workflow Automation Services
+    </a>
+
+</div>
+
 </section>
 
 {{-- WHY AIZON --}}
@@ -35,7 +58,7 @@
     <div class="max-w-6xl mx-auto text-center">
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 md:mb-6">Instant AI Solutions for Any Business</h2>
         <p class="text-gray-500 mb-6 md:mb-8 text-sm sm:text-base md:text-lg">Explore thousands of AI tools and automations for your workflow, sales, customer support, and industry-specific needs.</p>
-        <a href="#" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Browse AI Tools</a>
+        <a href="{{ route('public.tools.index') }}" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Browse AI Tools</a>
     </div>
 </section>
 
@@ -44,7 +67,7 @@
     <div class="max-w-6xl mx-auto">
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-4 md:mb-6">AI Skills for Everyone. Beginner to Advanced</h2>
         <p class="text-gray-300 mb-6 md:mb-8 text-sm sm:text-base md:text-lg">Learn AI concepts, workflows, prompt engineering, building agents, and industry-specific courses from anywhere in the world.</p>
-        <a href="#" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Explore AI Courses</a>
+        <a href="{{ route('public.courses.index') }}" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Explore AI Courses</a>
     </div>
 </section>
 
@@ -54,8 +77,8 @@
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 md:mb-6">Hire AI Talent or Get Hired — Globally</h2>
         <p class="text-gray-500 mb-6 md:mb-8 text-sm sm:text-base md:text-lg">Post jobs, find certified AI professionals, create profiles, and showcase skills to employers and recruiters.</p>
         <div class="flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
-            <a href="#" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Find AI Jobs</a>
-            <a href="#" class="px-6 py-3 border border-gray-600 text-gray-800 sm:text-white rounded-lg font-semibold hover:bg-purple-600 hover:text-white transition duration-300">Post a Job</a>
+            <a href="{{ route('public.jobs.index') }}" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Find AI Jobs</a>
+            <a href="{{ route('register') }}" class="px-6 py-3 border border-gray-600 text-gray-800 sm:text-white rounded-lg font-semibold hover:bg-purple-600 hover:text-white transition duration-300">Post a Job</a>
         </div>
     </div>
 </section>

@@ -1,15 +1,17 @@
 <nav class="px-8 py-4 flex justify-between items-center border-b border-gray-800">
-    <div class="text-2xl font-bold">
-        AIZON<span class="text-purple-500">Market</span>
-    </div>
+    <a href="/">
+        <div class="text-2xl font-bold">
+            AIZON<span class="text-purple-500">Market</span>
+        </div>
+    </a>
 
     <ul class="flex gap-6 text-sm">
         <li><a href="{{ route('public.tools.index') }}" class="hover:text-purple-400">AI Tools</a></li>
-        <li><a href="{{ route('public.courses.index') }}" class="hover:text-purple-400">Courses</a></li>
-        <li><a href="{{ route('public.jobs.index') }}" class="hover:text-purple-400">Jobs</a></li>
-        <li><a href="{{ route('public.hire.index') }}" class="hover:text-purple-400">Hire Talent</a></li>
-        <li><a href="{{ route('public.sell.index') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
-        <li><a href="{{ route('public.pricing.index') }}" class="hover:text-purple-400">Pricing</a></li>
+        <li><a href="{{ route('public.courses.index') }}" class="hover:text-purple-400">AI Courses</a></li>
+        <li><a href="{{ route('public.jobs.index') }}" class="hover:text-purple-400">AI Jobs</a></li>
+        <li><a href="{{ route('register') }}" class="hover:text-purple-400">Post AI Jobs</a></li>
+        <li><a href="{{ route('register') }}" class="hover:text-purple-400">Post AI Courses</a></li>
+        <li><a href="{{ route('register') }}" class="hover:text-purple-400">Sell AI Tools & Workflows Automation services</a></li>
 
         @guest
             <!-- Show Login if not logged in -->

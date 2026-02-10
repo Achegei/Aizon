@@ -18,7 +18,9 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($payouts as $payout)
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 font-mono text-gray-900">${{ number_format($payout->amount, 2) }}</td>
+                            <td class="px-6 py-4 font-mono text-gray-900">
+                                ${{ number_format($payout->amount, 2) }}
+                            </td>
                             <td class="px-6 py-4 text-gray-700 capitalize">{{ $payout->status }}</td>
                             <td class="px-6 py-4 text-gray-500">{{ $payout->created_at->format('M d, Y') }}</td>
                         </tr>
@@ -31,7 +33,7 @@
     <div class="mt-6 text-right">
         <span class="text-gray-500 mr-2 font-medium">Total Earnings:</span>
         <span class="text-2xl font-bold font-mono text-gray-900">
-            ${{ $totalEarnings ?? 0 }}
+            ${{ number_format($payouts->sum('amount'), 2) }}
         </span>
     </div>
 </div>

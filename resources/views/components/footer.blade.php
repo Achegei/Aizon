@@ -16,15 +16,14 @@
                 <li><a href="{{ route('public.tools.index') }}" class="hover:text-purple-400">AI Tools</a></li>
                 <li><a href="{{ route('public.courses.index') }}" class="hover:text-purple-400">Courses</a></li>
                 <li><a href="{{ route('public.jobs.index') }}" class="hover:text-purple-400">Jobs</a></li>
-                <li><a href="{{ route('public.hire.index') }}" class="hover:text-purple-400">Hire Talent</a></li>
+                
             </ul>
         </div>
 
         <div>
             <h4 class="text-white font-semibold mb-3">Creators</h4>
             <ul class="space-y-2">
-                <li><a href="{{ route('public.sell.index') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
-                <li><a href="#" class="hover:text-purple-400">Creator Dashboard</a></li>
+                <li><a href="{{ route('register') }}" class="hover:text-purple-400">Sell on AIZON</a></li>
             </ul>
         </div>
 

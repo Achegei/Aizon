@@ -14,41 +14,36 @@ class LoginController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required','email'],
-            'password' => ['required']
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
 
-            // Redirect based on user role
-            $user = Auth::user();
+        $user = Auth::user();
 
-            if ($user->isCreator()) {
-                return redirect()->route('creator.dashboard');
-            } elseif ($user->isEmployer()) {
-                return redirect()->route('employer.dashboard');
-            } elseif ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard');
-            }
-
-            // fallback if role doesn't match
-            abort(403, 'Unauthorized');
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials.',
-        ])->onlyInput('email');
+        if ($user->isCreator()) {
+            return redirect()->route('creator.dashboard');
+        }
+
+        if ($user->isEmployer()) {
+            return redirect()->route('employer.dashboard');
+        }
+
+        // ✅ MEMBER fallback (VERY IMPORTANT)
+        return redirect()->route('home');
     }
 
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    return back()->withErrors([
+        'email' => 'Invalid credentials.',
+    ])->onlyInput('email');
+}
 
-        return redirect('/login');
-    }
 }

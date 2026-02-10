@@ -1,6 +1,23 @@
 @extends('creator.layouts.app')
 
 @section('content')
+@php
+    use App\Models\Tool;
+    use App\Models\Course;
+    use App\Models\Payout;
+
+    $userId = auth()->id();
+
+    // Tools and courses counts
+    $toolsListedCount = Tool::where('creator_id', $userId)->count();
+    $coursesCreatedCount = Course::where('creator_id', $userId)->count();
+
+    // Total earnings from payouts for this creator
+    $totalEarnings = Payout::where('user_id', $userId)
+                    ->where('status', 'paid')
+                    ->sum('amount');
+@endphp
+
 <h1 class="text-2xl font-bold mb-4">Creator Dashboard</h1>
 <p>Welcome back, {{ auth()->user()->name }}! Here’s your activity overview.</p>
 
@@ -8,15 +25,15 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
     <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="font-semibold text-lg">Tools Listed</h2>
-        <p class="text-gray-500 mt-2">Total AI tools listed: 24</p>
+        <p class="text-gray-500 mt-2">Total AI tools listed: {{ $toolsListedCount }}</p>
     </div>
     <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="font-semibold text-lg">Courses Created</h2>
-        <p class="text-gray-500 mt-2">Total courses created: 10</p>
+        <p class="text-gray-500 mt-2">Total courses created: {{ $coursesCreatedCount }}</p>
     </div>
     <div class="bg-white p-4 shadow rounded-lg">
         <h2 class="font-semibold text-lg">Earnings</h2>
-        <p class="text-gray-500 mt-2">Total earnings: $1,250</p>
+        <p class="text-gray-500 mt-2">Total earnings: ${{ number_format($totalEarnings, 2) }}</p>
     </div>
 </div>
 

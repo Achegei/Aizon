@@ -13,19 +13,42 @@
         </p>
 
         <h3 class="mt-4 font-semibold text-gray-700">Cover Letter:</h3>
-        <p class="mt-1 text-gray-700">{{ $application->cover_letter ?? 'No cover letter provided' }}</p>
+        <p class="mt-1 text-gray-700">{{ $application->cover_letter_text ?? 'No cover letter provided' }}</p>
 
         @if($application->cv_path)
             <h3 class="mt-4 font-semibold text-gray-700">CV:</h3>
-            <a href="{{ asset($application->cv_path) }}" target="_blank" class="text-blue-600 hover:underline">
-                Download CV
-            </a>
+                <a href="{{ asset('storage/' . $application->cv_path) }}"
+                    target="_blank"
+                    class="text-blue-600 hover:underline">
+                        Download CV
+                </a>
         @endif
 
-        <p class="mt-4">
-            <strong>Status:</strong> {{ $application->status ?? 'Pending' }}
-        </p>
+        <div class="mt-6">
+            <form method="POST"
+                action="{{ route('employer.applications.updateStatus', $application) }}"
+                class="flex items-center gap-3">
+                @csrf
+                @method('PATCH')
 
+                <label class="font-semibold text-gray-700">Status:</label>
+
+                <select name="status"
+                        class="border rounded-lg px-3 py-2">
+                    @foreach(['pending','reviewed','shortlisted','rejected'] as $status)
+                        <option value="{{ $status }}"
+                            {{ $application->status === $status ? 'selected' : '' }}>
+                            {{ ucfirst($status) }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    Update
+                </button>
+            </form>
+        </div>
         <a href="{{ route('employer.applications.index') }}" class="mt-6 inline-block text-blue-600 hover:underline">
             ← Back to Applications
         </a>
