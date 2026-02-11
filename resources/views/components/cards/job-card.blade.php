@@ -2,15 +2,15 @@
 
     {{-- Job Info --}}
     <div>
-        <h3 class="text-2xl font-bold text-gray-900">{{ $job->title }}</h3>
-        <p class="text-gray-500 mt-1 text-sm">{{ $job->employer->name ?? 'Unknown Employer' }}</p>
+        <h3 class="text-2xl font-bold text-indigo-900">{{ $job->title }}</h3>
+        <p class="text-blue-500 mt-1 text-sm">{{ $job->employer->name ?? 'Unknown Employer' }}</p>
         <p class="text-gray-400 mt-1 text-sm">{{ $job->location ?? 'Remote' }} • {{ ucfirst($job->type ?? 'Full-time') }}</p>
 
         @if($job->salary_min && $job->salary_max)
         <p class="text-gray-600 mt-2 text-sm font-semibold">💰 ${{ $job->salary_min }} - ${{ $job->salary_max }}</p>
         @endif
 
-        <p class="text-gray-400 mt-2 text-xs">🕒 Posted {{ $job->created_at->diffForHumans() }}</p>
+        <p class="text-blue-400 mt-2 text-xs">🕒 Posted {{ $job->created_at->diffForHumans() }}</p>
     </div>
 
     {{-- Buttons --}}

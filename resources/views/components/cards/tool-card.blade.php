@@ -4,11 +4,10 @@
 
     {{-- Tool Info --}}
     <div>
-        <img src="{{ $tool->thumbnail_url ?? 'https://via.placeholder.com/400x200' }}" alt="{{ $tool->title }}" class="rounded-lg mb-4">
-        <h3 class="text-2xl font-bold text-gray-900">{{ $tool->title }}</h3>
-        <p class="text-gray-500 mt-1 text-sm">By {{ $tool->creator->name ?? 'Unknown' }}</p>
+        <h3 class="text-2xl font-bold text-indigo-900">{{ $tool->title }}</h3>
+        <p class="text-blue-500 mt-1 text-sm">By {{ $tool->creator->name ?? 'Unknown' }}</p>
         <p class="text-gray-400 mt-2 text-sm">{{ Str::limit($tool->description, 120) }}</p>
-        <p class="text-gray-400 mt-2 text-xs">🕒 Added {{ $tool->created_at->diffForHumans() }}</p>
+        <p class="text-blue-400 mt-2 text-xs">🕒 Added {{ $tool->created_at->diffForHumans() }}</p>
         @if($tool->price)
             <p class="text-gray-700 mt-2 font-semibold">💰 ${{ number_format($tool->price, 2) }}</p>
         @else

@@ -88,7 +88,7 @@
     <div class="max-w-6xl mx-auto">
         <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-4 md:mb-6">Monetize Your AI Skills. Earn Worldwide</h2>
         <p class="text-gray-300 mb-6 md:mb-8 text-sm sm:text-base md:text-lg">Creators can list AI tools, automations, prompts, mini-courses, and templates. Marketplace takes a 10–20% commission.</p>
-        <a href="#" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Become a Creator</a>
+        <a href="{{ route('register') }}" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition duration-300">Become a Creator</a>
     </div>
 </section>
 
@@ -118,8 +118,8 @@
 <section class="py-20 md:py-32 text-center bg-gradient-to-r from-purple-600 to-indigo-600 px-4 sm:px-6 lg:px-8">
     <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-snug md:leading-tight">Your AI Journey Starts in One Place — AIZON Market</h2>
     <div class="mt-6 md:mt-8 flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
-        <a href="#" class="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition duration-300">Explore AI Tools</a>
-        <a href="#" class="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition duration-300">Hire AI Talent</a>
+        <a href="{{ route('public.tools.index') }}" class="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition duration-300">Explore AI Tools</a>
+        <a href="{{ route('register') }}" class="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition duration-300">Hire AI Talent</a>
     </div>
 </section>
 

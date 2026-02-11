@@ -5,11 +5,11 @@
 
     {{-- Course Info --}}
     <div>
-        <h3 class="text-2xl font-bold text-gray-900">
+        <h3 class="text-2xl font-bold text-indigo-900">
             {{ $course->title }}
         </h3>
 
-        <p class="text-gray-500 mt-1 text-sm">
+        <p class="text-blue-500 mt-1 text-sm">
             By {{ $course->creator->name ?? 'Unknown' }}
         </p>
 
@@ -17,7 +17,7 @@
             {{ Str::limit($course->description, 120) }}
         </p>
 
-        <p class="text-gray-400 mt-2 text-xs">
+        <p class="text-blue-400 mt-2 text-xs">
             🕒 Created {{ $course->created_at->diffForHumans() }}
         </p>
     </div>

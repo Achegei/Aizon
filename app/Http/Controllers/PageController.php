@@ -110,4 +110,21 @@ class PageController extends Controller
     {
         return view('pages.pricing');
     }
+
+    public function about()
+    {
+        return view('pages.about');
+    }
+    public function faqs()
+    {
+        return view('pages.faqs');
+    }
+    public function terms()
+    {
+        return view('pages.terms');
+    }
+    public function privacy()
+    {
+        return view('pages.privacy');
+    }
 }

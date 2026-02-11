@@ -11,8 +11,10 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'total',
+        'buyer_id',
+        'tool_id',
+        'course_id',
+        'amount',
         'status',
     ];
 
@@ -20,8 +22,50 @@ class Order extends Model
         'status' => OrderStatus::class,
     ];
 
-    public function user()
+    /**
+     * Buyer of the tool/course
+     */
+    public function buyer()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'buyer_id');
+    }
+
+    /**
+     * If this order is for a tool
+     */
+    public function tool()
+    {
+        return $this->belongsTo(Tool::class, 'tool_id');
+    }
+
+    /**
+     * If this order is for a course
+     */
+    public function course()
+    {
+        return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    /**
+     * Get the creator of the purchased product
+     */
+    public function creator()
+    {
+        if ($this->tool_id) {
+            return $this->tool?->creator; // property, not method
+        }
+        if ($this->course_id) {
+            return $this->course?->creator; // property, not method
+        }
+        return null;
+    }
+
+
+    /**
+     * Determine if order is completed
+     */
+    public function isCompleted(): bool
+    {
+        return $this->status === OrderStatus::COMPLETED;
     }
 }

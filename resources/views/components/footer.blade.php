@@ -4,9 +4,8 @@
         <div>
             <h4 class="text-white font-semibold mb-3">AIZON Market</h4>
             <ul class="space-y-2">
-                <li><a href="#" class="hover:text-purple-400">About</a></li>
-                <li><a href="{{ route('public.pricing.index') }}" class="hover:text-purple-400">Pricing</a></li>
-                <li><a href="#" class="hover:text-purple-400">FAQ</a></li>
+                <li><a href="{{ route('public.about') }}" class="hover:text-purple-400">About</a></li>
+                <li><a href="{{ route('public.faqs') }}" class="hover:text-purple-400">FAQ</a></li>
             </ul>
         </div>
 
@@ -30,8 +29,8 @@
         <div>
             <h4 class="text-white font-semibold mb-3">Legal</h4>
             <ul class="space-y-2">
-                <li><a href="#" class="hover:text-purple-400">Terms</a></li>
-                <li><a href="#" class="hover:text-purple-400">Privacy</a></li>
+                <li><a href="{{ route('public.terms') }}" class="hover:text-purple-400">Terms</a></li>
+                <li><a href="{{ route('public.privacy') }}" class="hover:text-purple-400">Privacy</a></li>
             </ul>
         </div>
         

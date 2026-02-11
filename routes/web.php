@@ -58,6 +58,10 @@ Route::get('/jobs/{job}', [PageController::class, 'jobShow'])->name('public.jobs
 Route::get('/hire-talent', [PageController::class, 'hireTalent'])->name('public.hire.index');
 Route::get('/sell-on-aizon', [PageController::class, 'sell'])->name('public.sell.index');
 Route::get('/pricing', [PageController::class, 'pricing'])->name('public.pricing.index');
+Route::get('/about', [PageController::class, 'about'])->name('public.about');
+Route::get('/faqs', [PageController::class, 'faqs'])->name('public.faqs');
+Route::get('/terms', [PageController::class, 'terms'])->name('public.terms');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('public.privacy');
 
 
 // Job application route (requires login)

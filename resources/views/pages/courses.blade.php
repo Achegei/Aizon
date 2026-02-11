@@ -2,14 +2,21 @@
 
 @section('content')
 <!-- Courses Grid -->
-<section id="courses" class="py-16 md:py-24 px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
+<section id="courses" class="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-gray-50">
+
+    {{-- Ambient soft glow for depth --}}
+    <div class="absolute inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-100 rounded-full blur-3xl opacity-30"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-30"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         @forelse($courses as $course)
             <div class="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition border border-gray-200 flex flex-col justify-between p-6">
-                
+
                 {{-- Removed image --}}
                 <h3 class="text-2xl font-bold text-gray-900">{{ $course->title }}</h3>
-                <p class="text-gray-500 mt-1 text-sm">
+                <p class="text-indigo-600 mt-1 text-sm">
                     By {{ optional($course->creator)->name ?? 'Unknown Instructor' }}
                 </p>
                 <p class="text-gray-600 mt-2 text-sm">{{ \Illuminate\Support\Str::limit($course->description, 120) }}</p>
@@ -42,7 +49,7 @@
     <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white">
         Explore Our AI Courses
     </h1>
-    <p class="mt-4 text-white/90 max-w-3xl mx-auto text-lg sm:text-xl">
+    <p class="mt-4 text-white/90 max-w-3xl mx-auto text-lg sm:text-xl leading-relaxed">
         Learn AI skills from beginner to advanced. Browse courses created by expert instructors.
     </p>
     <a href="{{ route('public.courses.index') }}"
@@ -50,5 +57,4 @@
         Browse Courses
     </a>
 </section>
-
 @endsection
