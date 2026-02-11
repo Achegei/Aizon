@@ -68,4 +68,10 @@ class Order extends Model
     {
         return $this->status === OrderStatus::COMPLETED;
     }
+
+    public function payout()
+{
+    return $this->hasOne(Payout::class);
+}
+
 }

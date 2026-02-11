@@ -21,7 +21,7 @@ class User extends Authenticatable
         'role',        // Enum-backed column
         'settings',    // JSON user preferences
         'is_active',
-        'is_approved', // For marketplace approval workflow
+        'is_approved',
     ];
 
     /**
@@ -37,19 +37,11 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-
-        // Laravel default hashed password
-        'password' => 'hashed',
-
-        // Flags
-        'is_active' => 'boolean',
-        'is_approved' => 'boolean',
-
-        // JSON
-        'settings' => 'array',
-
-        // PHP 8.1 enum cast
-        'role' => UserRole::class,
+        'password'          => 'hashed',
+        'is_active'         => 'boolean',
+        'is_approved'       => 'boolean',
+        'settings'          => 'array',
+        'role'              => UserRole::class, // Enum cast
     ];
 
     /*
@@ -91,7 +83,6 @@ class User extends Authenticatable
         return $this->role === UserRole::MEMBER;
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Approval Workflow
@@ -100,20 +91,42 @@ class User extends Authenticatable
 
     public function needsApproval(): bool
     {
-        return in_array($this->role, [UserRole::CREATOR, UserRole::EMPLOYER]) && !$this->is_approved;
+        return in_array($this->role, [
+            UserRole::CREATOR,
+            UserRole::EMPLOYER
+        ]) && !$this->is_approved;
     }
 
     public function canPerform(string $action): bool
     {
-        // Example dynamic permissions logic
-        // You could replace this with a permissions table later
         $permissions = [
-            UserRole::SUPER_ADMIN->value => ['manage_admins','manage_staff','approve_users','delete_users','post_jobs','access_marketplace'],
-            UserRole::ADMIN->value       => ['manage_staff','approve_users','delete_users','post_jobs','access_marketplace'],
-            UserRole::STAFF->value       => ['post_jobs','access_marketplace'],
+            UserRole::SUPER_ADMIN->value => [
+                'manage_admins',
+                'manage_staff',
+                'approve_users',
+                'delete_users',
+                'post_jobs',
+                'access_marketplace'
+            ],
+
+            UserRole::ADMIN->value => [
+                'manage_staff',
+                'approve_users',
+                'delete_users',
+                'post_jobs',
+                'access_marketplace'
+            ],
+
+            UserRole::STAFF->value => [
+                'post_jobs',
+                'access_marketplace'
+            ],
         ];
 
-        return in_array($action, $permissions[$this->role->value] ?? []);
+        return in_array(
+            $action,
+            $permissions[$this->role->value] ?? []
+        );
     }
 
     /*
@@ -140,5 +153,28 @@ class User extends Authenticatable
     public function payouts()
     {
         return $this->hasMany(\App\Models\Payout::class, 'user_id');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(\App\Models\Wallet::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Wallet Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get current wallet balance (based on latest payout)
+     */
+    public function walletBalance(): float
+    {
+        $latestBalance = $this->payouts()
+            ->latest()
+            ->value('balance_after');
+
+        return (float) ($latestBalance ?? 0);
     }
 }
